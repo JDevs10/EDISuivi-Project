@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-lg navbar-light core-color">
+    <a class="navbar-brand core-color-text-color" href="/home">EDISuivi <span style="text-decoration: underline;">{{client_name}}</span></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedHeader" aria-controls="navbarSupportedHeader" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedHeader">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle core-color-text-color" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Modules
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" routerLink="suivi-commandes" >Suivi des commandes</a>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle core-color-text-color" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user"></i>
+            SuperAdmin
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" routerLink="support-interne">Support</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="this.authenticationService.doLogout();">Déconnexion</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </li>
+        <li class="nav-item m-auto">
+          <i class="fas fa-info core-color-text-color"></i>
+        </li>
+      </ul>
+
+      <!-- <div id="end-right-info" class="row">
+        <div class="row user-onhower">
+          <i class="fas fa-user core-color-text-color m-auto pr-2"></i>
+          <p class="mt-auto mb-auto core-color-text-color">SuperAdmin</p>
+        </div>
+        <div class="p-2">
+          <i class="fas fa-info core-color-text-color pl-3"></i>
+        </div>
+      </div> -->
+    </div>
+</nav>

@@ -1,0 +1,23 @@
+.core-color{
+    background-color: #3c6389;
+}
+
+.core-color-text-color {
+    color: white !important;
+}
+
+.nav-link:hover{
+    /* background-color: #1a5086; */
+    background-color: #ffffff;
+    color: black !important;
+    border-radius: 5px;
+}
+
+#end-right-info > i{
+    margin: 50;
+}
+
+.user-onhower:hover{
+    text-decoration: underline;
+    color: white !important;
+}
