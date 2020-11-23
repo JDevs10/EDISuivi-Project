@@ -9,15 +9,23 @@ import { AuthenticationService } from '../services/authentication/authentication
 })
 export class HeaderComponent implements OnInit {
 
-  client_name: string = 'NomClient'
+  userInfo = {
+    client_name: 'NomClient',
+    user_name: 'Nothing'
+  }
 
   constructor(public authenticationService: AuthenticationService) { }
 
   ngOnInit(): void {
+    this.getUserInfo(); 
   }
 
-  test(){
-    console.log('clicked');
+  getUserInfo(){
+    if(!!localStorage.getItem("userSuccess")){
+      const data = JSON.parse(localStorage.getItem("userSuccess"));
+      this.userInfo.client_name = data.success.nom_entreprise;
+      this.userInfo.user_name = data.success.identifiant_EDISuivi;
+    }
   }
 
 }

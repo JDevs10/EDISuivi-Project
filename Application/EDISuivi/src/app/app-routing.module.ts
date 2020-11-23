@@ -12,22 +12,23 @@ import { HomeComponent } from './home/home.component';
 
 
 const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full'},
+  { path: '', redirectTo: 'login', pathMatch: 'full'},
   { path: 'login', component: LoginComponent},
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard],
+  { path: 'home', component: HomeComponent, pathMatch : 'prefix', canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashbord', pathMatch: 'full' },
       { path: 'dashbord', component: DashbordComponent },
       { path: 'suivi-commandes', component: SuiviCommandeComponent },
-      { path: 'suivi-dommande-detail/:id', component: SuiviCommandeDetailComponent },
+      { path: 'suivi-commande-detail/:id', pathMatch: 'full', component: SuiviCommandeDetailComponent },
       { path: 'support-interne', component: SupportInterneComponent }
     ]
   },
+  // { path: 'dashbord/N/suivi-commande-detail/:id', component: SuiviCommandeDetailComponent },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes ,{useHash: true})
   ],
   exports: [RouterModule]
 })

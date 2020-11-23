@@ -1,10 +1,14 @@
-<header>
-    <app-header></app-header>
-</header>
-
-<router-outlet></router-outlet>
-
-<footer>
-    <app-footer></app-footer>
-</footer> 
+<div style="position: relative; min-height: 100vh;">
+    <header>
+        <app-header></app-header>
+    </header>
+    
+    <div style="padding: 10px; background-color: #eeeeee; padding-bottom: 80px;">
+        <router-outlet></router-outlet>
+    </div>
+    
+    <footer style="text-align: center;">
+        <app-footer></app-footer>
+    </footer> 
+</div>
 

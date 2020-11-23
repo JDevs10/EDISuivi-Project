@@ -1,1 +1,172 @@
-<p>suivi-commande-detail works!</p>
+<div style="background-color: #fff; padding: 10px; border: solid; border-width: 1px; border-color: #000;">
+    <div class="my-row">
+        <div class="col-xs-10 col-sm-8 col-lg-10">
+            <div class="mr-auto">
+                <div id="Header-cmd-info-1" class="container">
+                    <div class="row">
+                        <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Référence : </span>{{order.ref}}</p>
+                        <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Client 1 : </span>{{order.client1}}</p>
+                        <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Client 2 : </span>{{order.client2}}</p>
+                        <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Assigné : </span><span style="text-decoration: underline;">{{order.assign}}</span></p>
+                    </div>
+                </div>
+    
+                <div id="Header-cmd-info-2" class="container">
+                    <div class="row">
+                        <table style="width: 400px;display: block;overflow-x: auto;white-space: nowrap;">
+                            <tr>
+                                <th class="col-sx-6" style="padding: 5px; margin-right: 5px;">Référence</th>
+                                <th class="col-sx-6" style="padding: 5px; margin-right: 5px;">Client 1</th>
+                                <th class="col-sx-6" style="padding: 5px; margin-right: 5px;">Client 2</th>
+                                <th class="col-sx-6" style="padding: 5px; margin-right: 5px;">Assigné</th>
+                            </tr>
+                            <tr>
+                                <td class="col-sx-6" style="padding: 5px; margin-right: 5px;">{{order.ref}}</td>
+                                <td class="col-sx-6" style="padding: 5px; margin-right: 5px;">{{order.client1}}</td>
+                                <td class="col-sx-6" style="padding: 5px; margin-right: 5px;">{{order.client2}}</td>
+                                <td class="col-sx-6" style="padding: 5px; margin-right: 5px;"><span style="text-decoration: underline;">{{order.assign}}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-2 col-sm-4 col-lg-2" >
+            <div id="Header-statut-cmd-info-1" style="background-color: #3c6389; color: #fff; border-radius: 5px; text-align: center; width: 150px; margin: 0 0 0 auto">
+                <p style="padding: 5px;">Order In process</p>
+            </div>
+            <div id="Header-statut-cmd-info-2" style="background-color: #3c6389; color: #fff; border-radius: 5px; text-align: center; width: 150px; margin: 0 0 0 auto">
+                <p id="Header-statut-cmd-info-2" style="padding: 5px;"><span style="font-weight: bold;">Statut : </span>{{order.status}}</p>
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+    <!-- col-xs-12 col-sm-5 col-md-4 col-xl-3 -->
+    <div class="container">
+        <div class="row">
+            <div class="" style="margin: 10px;">
+                <span><span style="font-weight: bold;">Référence : </span>{{order.ref}}</span><br>
+                <span><span style="font-weight: bold;">Client 1 : </span>{{order.client1}}</span><br>
+                <span><span style="font-weight: bold;">Client 2 : </span>{{order.client2}}</span><br>
+                <span><span style="font-weight: bold;">Assigné : </span><span style="text-decoration: underline;">{{order.assign}}</span></span><br>
+            </div>
+            <div class=" cmd-adresse">
+                <div class="header-cmd-adresse">
+                    <p>Adresse de livraison</p>
+                </div>
+                <div class="body-cmd-adresse">
+                    <p id="delivery-adress-text">{{order.deliveryAddress}}</p>
+                </div>
+            </div>
+            <div class=" cmd-adresse">
+                <div class="header-cmd-adresse">
+                    <p>Adresse de facturation</p>
+                </div>
+                <div class="body-cmd-adresse">
+                    <p id="invoice-adress-text">{{order.invoiceAddress}}</p>
+                </div>
+            </div>
+            <div class=""  style="margin: 10px; ">
+                <span><span style="font-weight: bold;">Montant Prestation : </span>{{order.benefitAmout}} €</span><br>
+                <span><span style="font-weight: bold;">Montant HT : </span>{{order.htAmout}} €</span><br>
+                <span><span style="font-weight: bold;">Montant TVA : </span>{{order.tvaAmount}} €</span><br> 
+                <span><span style="font-weight: bold;">Montant TTC : </span>{{order.ttcAmout}} €</span><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="cmd-cmmt-ame">
+            <div class="header-cmmt-ame">
+                <p>Commentaire</p>
+            </div>
+            <div class="body-cmmt-ame">
+                <p id="invoice-adress-text">{{order.comment}}</p>
+            </div>
+        </div>
+        <div class="cmd-cmmt-ame">
+            <div class="header-cmmt-ame">
+                <p>Anomalie</p>
+            </div>
+            <div class="body-cmmt-ame">
+                <p id="invoice-adress-text">{{order.anomaly}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="background-color: #fff; padding: 10px; border: solid; border-width: 1px; border-color: #000;">
+    <!-- <div class="my-row"> -->
+        <table class="cmd-line-table">
+            <thead class="cmd-line-table-thead">
+                <tr>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Code-bare</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Référence</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Désignation</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Volume</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Poids</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Quantitée</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Prix Uni. HT</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">TVA</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Prix TVA</th>
+                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Prix TTC</th>
+                </tr>
+            </thead>
+
+            <tbody *ngFor="let line of order.lines">
+                <tr class="cmd-line-table-tbody-tr">
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.barecode}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.ref}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.label}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.volume}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.weight}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.qty}}</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.unitPriceHT}} €</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.montantHT}} €</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.tva}} €</td>
+                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.unitPriceTTC}} €</td>
+                </tr>
+            </tbody>
+        </table>
+    <!-- </div> -->
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10 col-md-4 col-lg-4 cmd-files">
+            <div class="header-cmd-files">
+                <p>Fichier joint(s)</p>
+            </div>
+            <div class="body-cmd-files">
+                <table class="cmd-files-table">
+                    <thead class="cmd-files-table-thead">
+                        <tr>
+                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Nom</th>
+                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Tail</th>
+                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Date</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody *ngFor="let line of order.last_main_doc.files">
+                        <tr class="cmd-files-table-tbody-tr">
+                            <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="http://82.253.71.109/prod/bdc_v11_04/custom/edisuivi/backend/download_v2.php?modulepart=commande&file=CMD201002-000413%2FCMD201002-000413.pdf&entity=1" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td>
+                            <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.size}}</td>
+                            <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.dateTime}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+            <div class="cmd-action">
+                <button class="cmd-action-btn">Voir BL</button>
+                <button class="cmd-action-btn">Voir Facture</button>
+                <button class="cmd-action-btn" (click)="download_();">Download</button>
+            </div>
+        </div>
+    </div>
+</div>

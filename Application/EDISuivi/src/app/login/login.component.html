@@ -1,9 +1,11 @@
 <div id="content" class="container">
     <form [formGroup]="this.authenticationService.loginForm" class="form-group form-signin">
-      <img class="mb-4" src="favicon.ico" alt="EDISuivi Icon" width="150" height="150">
+      <img class="mb-4" src="assets/logo-CTM-small.png" alt="EDISuivi Icon" width="150" height="150">
       <h1 class="h3 mb-3 font-weight-normal">Veuillez vous identifier</h1>
+
+      <h3 style="background-color: orange; font-weight: bold; text-align: center;">Site Web en construction</h3>
   
-      <div class="form-group">
+      <div class="form-group"> 
         <label>Utilisateur</label>
         <input type="user" formControlName="user" class="form-control" placeholder="Ex: John" required>
       </div>
@@ -13,7 +15,7 @@
       </div>
       <div style="text-align: center;">
         <a href="support">Mot de passe oublié ?</a> <br><br>
-        <button type="submit" (click)="tryLogin(this.authenticationService.loginForm.value)" class="btn btn-default bg-info" style="color: white; ">Se Connecter</button>
+        <button id="btn-one" type="submit" (click)="tryLogin(this.authenticationService.loginForm.value)" class="btn btn-default bg-info" style="color: white; ">Se Connecter</button>
       </div>
     </form>
 </div>

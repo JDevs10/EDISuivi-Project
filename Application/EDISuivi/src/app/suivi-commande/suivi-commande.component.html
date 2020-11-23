@@ -1,1 +1,86 @@
-<p>suivi-commande works!</p>
+<div class="main-style borders-no-radius">
+    <div class="main-header-container">
+        <div class="my-row">
+            <i class="fas fa-boxes" style="margin-right: 10px;"></i>
+            <p>Liste des commandes ({{total_cmds}})</p>
+        </div>
+        <div class="row ml-auto">
+            <!-- <div class="my-row borders-no-radius" style="margin: auto 5px auto 0px">
+                <p style="margin: auto 5px;">25</p>
+                <i class="fas fa-long-arrow-alt-down" style="margin: auto 5px;"></i>
+            </div> -->            
+            
+            <div class="col-sl my-row">
+                <button class="pages" style="margin: auto 1px;" (click)="loadPreviousPage()"><i class="fas fa-angle-left fa-lg"></i> Précédente</button>
+                
+                <p id="page-current-all" style="margin: auto 3px;">NaN/NaN</p>
+
+                <!-- <div class="my-row" *ngFor="let page of total_pages">
+                    <button class="pages" style="margin: auto 1px;" (click)="loadSelectedPage(page)">{{page}}</button>
+                </div> -->
+                
+                <button class="pages" style="margin: auto 1px;" (click)="loadNextPage()">Suivant <i class="fas fa-angle-right fa-lg"></i></button>
+            </div>
+
+            <form [formGroup]="this.commandeService.limitForm" class="col-sl" style="margin: auto 20px;">
+                <select id="_cmdListNb_" formControlName="limit">
+                    <!-- <option *ngFor="let page of tt_pages" value="{{page}}">{{page}}</option> -->
+                    <option *ngFor="let page of tt_pages_" value="{{page.value}}">{{page.value}}</option>
+                    <!-- <option id="limit-id-0" value="25" selected>25</option>
+                    <option id="limit-id-1" value="50">50</option>
+                    <option id="limit-id-2" value="75">75</option>
+                    <option id="limit-id-3" value="100">100</option> -->
+                </select>
+                <button id="btn-one" class="pages" style="margin: 0px 0px 0px 10px;" type="submit" (click)="getOrderByLimit()"><i class="fas fa-search fa-lg"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-cmds">
+        <div id="main-cmd-content">
+
+            <table class="cmd-table">
+                <thead class="cmd-table-thead">
+                    <tr class="cmd-table-tbody-tr">
+                        <th class="table-cell" style="">Référence</th>
+                        <th class="table-cell" style="">Platforme</th>
+                        <th class="table-cell" style="">Date de Saisi</th>
+                        <th class="table-cell" style="">Date de livraison</th>
+                        <th class="table-cell" style="">Code Postal</th>
+                        <th class="table-cell" style="">Vile</th>
+                        <th class="table-cell" style="">statut</th>
+                    </tr>
+                </thead>
+                <tbody *ngFor="let order of orders">
+                    <tr class="cmd-table-tbody-tr">
+                        <td class="table-cell" style=""><a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">{{order.ref}}</a></td>
+                        <td class="table-cell" style="">{{order.platforme}}</td>
+                        <td class="table-cell" style="">{{order.date_creation}}</td>
+                        <td class="table-cell" style="">{{order.date_livraison}}</td>
+                        <td class="table-cell" style="">{{order.zip}}</td>
+                        <td class="table-cell" style="">{{order.town}}</td>
+                        <td class="table-cell" style="">{{order.statut}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- <br><br><br>
+
+            <div *ngFor="let order of orders" class="my-row-lines cmd-content-lines borders-radius">
+                <a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">Référence: {{order.ref}}</a>
+                <p style="margin: auto;">Platforme: {{order.platforme}}</p>
+                <p style="margin: auto;">Date de saisi: {{order.date_creation}}</p>
+                <p style="margin: auto;">Date de livraison: {{order.date_livraison}}</p>
+                <p style="margin: auto;">Code Postal: {{order.zip}}</p>
+                <p style="margin: auto;">Ville {{order.town}}</p>
+                <p style="margin: auto;">{{order.statut}}</p>
+            </div> -->
+        </div>
+        <div id="main-cmd-loading">
+            
+        </div>
+        <div id="main-cmd-error">
+            
+        </div>
+    </div>
+</div>

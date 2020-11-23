@@ -1,12 +1,20 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
-  constructor() { }
+  private cors_http = "https://cors-anywhere.herokuapp.com/";
+  private url_test = `${this.cors_http}http://82.253.71.109/prod/bdc_v11_04/api/index.php`;
+  private url = `http://82.253.71.109/prod/bdc_v11_04/api/index.php`;
+  private DOLAPIKEY = "3-8-13-12-7-8-24-8";
+
+  constructor(private http: HttpClient, private router: Router) { }
 
   loginForm = new FormGroup({
     user: new FormControl('', Validators.required),
@@ -16,8 +24,8 @@ export class AuthenticationService {
   loggedIn(){
     // if the user token exist the return is true or else false
     let res = false;
-    if(!!localStorage.getItem("userToken")){
-      const data = JSON.parse(localStorage.getItem("userToken"));
+    if(!!localStorage.getItem("userSuccess")){
+      const data = JSON.parse(localStorage.getItem("userSuccess"));
       
       console.log("validTime : ", data.valideData);
 
@@ -35,23 +43,28 @@ export class AuthenticationService {
     return res
   }
 
-  doLogin(value){
-    // alert("user : "+value.user+"\npassword: "+value.password);
-    const d = new Date();
-    const validTime = d.getTime() + 900000;
-    const data = {
-      token: "hello test token JL => "+value.user, 
-      valideData: validTime
+  doLogin(value): Observable<any[]>{
+    console.log("url : ", this.url_test+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    return this.http.post<any[]>(this.url_test+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+  }
+
+  getLoggedInUserInfo(){
+    if(!!localStorage.getItem("userSuccess")){
+      const data = JSON.parse(localStorage.getItem("userSuccess"));
+      //console.log("success : ", data.success);
+      return data.success;
     }
-    localStorage.setItem("userToken", JSON.stringify(data));
-    window.location.href="home";
+    return null;
   }
 
   doLogout() {
-    localStorage.removeItem('userUid');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem("userToken");
-    window.location.href="login";
+    localStorage.removeItem("userSuccess");
+    // window.location.href="/#/login";
  }
+
+ doLogout_() {
+  localStorage.removeItem("userSuccess");
+  this.router.navigate(['../login']);
+}
 
 }
