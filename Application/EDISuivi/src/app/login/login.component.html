@@ -1,26 +1,27 @@
 <div id="content" class="container">
-    <form [formGroup]="this.authenticationService.loginForm" class="form-group form-signin">
-      <img class="mb-4" src="assets/logo-CTM-small.png" alt="EDISuivi Icon" width="150" height="150">
-      <h1 class="h3 mb-3 font-weight-normal">Veuillez vous identifier</h1>
 
-      <h3 style="background-color: orange; font-weight: bold; text-align: center;">Site Web en construction</h3>
-  
-      <div class="form-group"> 
-        <label>Utilisateur</label>
-        <input type="user" formControlName="user" class="form-control" placeholder="Ex: John" required>
-      </div>
-      <div class="form-group">
-        <label>Mot de passe</label>
-        <input type="password" class="form-control" placeholder="Ex: Doe1425!," formControlName="password" required>
-      </div>
-      <div style="text-align: center;">
-        <a href="support">Mot de passe oublié ?</a> <br><br>
-        <button id="btn-one" type="submit" (click)="tryLogin(this.authenticationService.loginForm.value)" class="btn btn-default bg-info" style="color: white; ">Se Connecter</button>
-      </div>
-    </form>
+  <form [formGroup]="this.authenticationService.loginForm" class="form-group form-signin"
+    style="background-color:#e9e9e9;border-radius: 25px;border-style: solid;border-width: 2;padding: 30px;border-color: #3C6389;">
+
+    <img class="rounded-circle" src="assets/logo-CTM-small.png" alt="EDISuivi Icon" width="150" height="150">
+
+    <div class="form-group">
+      <label>Utilisateur</label>
+      <input type="user" formControlName="user" class="form-control" placeholder="Ex: John" required>
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" class="form-control" placeholder="Ex: Doe1425!," formControlName="password" required>
+    </div>
+    <div style="text-align: center;">
+      <a href="support">Mot de passe oublié ?</a> <br><br>
+      <button id="btn-one" type="submit" (click)="tryLogin(this.authenticationService.loginForm.value)"
+        class="btn btn-default" style="background-color:#3C6389;color: white; ">Se Connecter</button>
+    </div>
+  </form>
 </div>
 
 <!-- footer -->
 <footer>
-    <app-footer></app-footer>
+  <app-footer></app-footer>
 </footer>
