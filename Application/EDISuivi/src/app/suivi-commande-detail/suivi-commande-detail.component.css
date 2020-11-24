@@ -56,6 +56,10 @@
     margin-left: 10px;
 }
 
+#invoice-adress-text{
+    padding-right: 10px;
+}
+
 .cmd-cmmt-ame {
     min-width: 500px;
     min-height: 150px;
@@ -78,6 +82,7 @@
     border-width: 1px; 
     border-color: #000;
     padding: 5px;
+    margin-bottom: 20px;
 }
 .header-cmmt-ame > p {
     margin-left: 10px;
@@ -182,12 +187,12 @@
 }
 
 .cmd-action {
-    max-width: 500px;
-    min-height: 150px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 40px; 
-    margin-bottom: 40px;
+    /* max-width: 500px; */
+    /* min-height: 20px; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* margin-top: 40px;  */
+    /* margin-bottom: 40px; */
 }
 
 .cmd-action-btn {
@@ -197,14 +202,18 @@
     padding-left: 10px;
     padding-right: 10px;
     color: #ffffff;
-    background-color: #2b73bb;
+    /* background-color: #2b73bb; */
+    background-color: gray;
 }
 
+/*
 .cmd-action-btn:hover{
     color: #ffffff;
     font-weight: bold;
     background-color: #2b73bb;
 }
+*/
+
 
 @media (min-width: 1200px){
     .container{

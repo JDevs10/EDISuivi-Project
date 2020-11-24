@@ -26,9 +26,8 @@ export class CommandeService {
   }
 
   getOrderById(id): Observable<any>{
-    console.log("url : ", this.url_test+`/orders/${id}?contact_list=1&DOLAPIKEY=${this.DOLAPIKEY}`);
-    // return this.http.get<any>(this.url_test+`/orders/${id}?contact_list=1&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
-    return this.http.get<any>(`${this.cors_http}http://82.253.71.109/prod/bdc_v11_04/api/index.php/orders/672?contact_list=1&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+    console.log("url : ", `${this.url_test}/edisuiviapi/order/id?id=${id}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    return this.http.get<any>(`${this.url_test}/edisuiviapi/order/id?id=${id}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 
   }
 

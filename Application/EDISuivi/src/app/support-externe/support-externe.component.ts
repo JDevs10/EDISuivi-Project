@@ -3,11 +3,11 @@ import { Router } from '@angular/router';
 import { SupportService } from '../services/support/support.service';
 
 @Component({
-  selector: 'app-support-interne',
-  templateUrl: './support-interne.component.html',
-  styleUrls: ['./support-interne.component.css']
+  selector: 'app-support-externe',
+  templateUrl: './support-externe.component.html',
+  styleUrls: ['./support-externe.component.css']
 })
-export class SupportInterneComponent implements OnInit {
+export class SupportExterneComponent implements OnInit {
 
   constructor(private router: Router, public supportService: SupportService) { }
 
@@ -29,4 +29,5 @@ export class SupportInterneComponent implements OnInit {
   back(){
     this.router.navigate(['../']);
   }
+
 }

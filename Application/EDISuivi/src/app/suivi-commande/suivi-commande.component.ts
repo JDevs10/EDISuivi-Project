@@ -14,6 +14,8 @@ import { resolve } from 'dns';
 })
 export class SuiviCommandeComponent implements OnInit {
 
+  loading = true; // var to show loading UI
+  show = false;   // var to show content UI after loading
   total_cmds = "NaN";
   current_page: number = 1;
   total_pages = 1;
@@ -48,6 +50,20 @@ export class SuiviCommandeComponent implements OnInit {
     this.getOrders(this.ordersParams);
   }
 
+  showLoadingUI(value){
+    var loading = document.getElementById('main-content-loading');
+    var content = document.getElementById('main-content-s-cmd');
+
+    if(value){
+      loading.style.display = "block";
+      content.style.display = "none";
+    }else{
+      loading.style.display = "none";
+      content.style.display = "block";
+    }
+    this.loading = value;
+    this.show = !value;
+  }
 
   getOrderByLimit() {
     console.log("limitForm ", this.commandeService.limitForm.value);
@@ -56,6 +72,7 @@ export class SuiviCommandeComponent implements OnInit {
   }
 
   async getOrders(params){
+    // this.showLoadingUI(true);
 
     const res: SuccessOrder = await new Promise(async (resolved) => {
       await this.commandeService.getOrders(params).subscribe(async (data) => {
@@ -70,9 +87,12 @@ export class SuiviCommandeComponent implements OnInit {
     var pageLabel = document.getElementById('page-current-all');
     pageLabel.innerText = (this.current_page + 1)+"/"+this.total_pages;
     this.orders = res.success.cmds;
+
+    // this.showLoadingUI(false);
   }
 
   loadPreviousPage(){
+    // this.showLoadingUI(true);
     const previousPage = (this.current_page - 1);
     if(previousPage > -1){
       console.log("loadPreviousPage => "+previousPage);
@@ -82,9 +102,12 @@ export class SuiviCommandeComponent implements OnInit {
       pageLabel.innerText = previousPage+"/"+this.total_pages;
       this.getOrders(this.ordersParams);
     }
+    // this.showLoadingUI(false);
   }
 
   loadNextPage(){
+    // this.showLoadingUI(true);
+
     const nextPage = (this.current_page + 1);
     if(nextPage < this.total_pages){
       console.log("loadPreviousPage => "+nextPage);
@@ -94,5 +117,7 @@ export class SuiviCommandeComponent implements OnInit {
       pageLabel.innerText = nextPage +"/"+this.total_pages;
       this.getOrders(this.ordersParams);
     }
+
+    // this.showLoadingUI(false);
   }
 }

@@ -17,6 +17,10 @@ import { SupportInterneComponent } from './support-interne/support-interne.compo
 import { SuiviCommandeComponent } from './suivi-commande/suivi-commande.component';
 import { SuiviCommandeDetailComponent } from './suivi-commande-detail/suivi-commande-detail.component';
 import { HomeComponent } from './home/home.component';
+import { SuiviFacturesComponent } from './suivi-factures/suivi-factures.component';
+import { SuiviStocksComponent } from './suivi-stocks/suivi-stocks.component';
+import { SettingsComponent } from './settings/settings.component';
+import { SupportExterneComponent } from './support-externe/support-externe.component';
 
 
 @NgModule({
@@ -30,6 +34,10 @@ import { HomeComponent } from './home/home.component';
     SupportInterneComponent,
     SuiviCommandeComponent,
     SuiviCommandeDetailComponent,
+    SuiviFacturesComponent,
+    SuiviStocksComponent,
+    SettingsComponent,
+    SupportExterneComponent,
   ],
   imports: [
     BrowserModule,

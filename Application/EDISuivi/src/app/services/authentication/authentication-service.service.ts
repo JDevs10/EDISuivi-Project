@@ -17,8 +17,8 @@ export class AuthenticationService {
   constructor(private http: HttpClient, private router: Router) { }
 
   loginForm = new FormGroup({
-    user: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+    user: new FormControl('JL_test', Validators.required),
+    password: new FormControl('anexys1,', Validators.required)
   });
 
   loggedIn(){
