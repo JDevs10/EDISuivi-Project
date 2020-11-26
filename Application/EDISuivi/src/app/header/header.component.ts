@@ -20,6 +20,10 @@ export class HeaderComponent implements OnInit {
     this.getUserInfo(); 
   }
 
+  info(){
+    alert('Edisuivi information.....');
+  }
+
   getUserInfo(){
     
     const data = this.authenticationService.getLoggedInUserInfo();
