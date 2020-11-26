@@ -21,8 +21,9 @@ export class HeaderComponent implements OnInit {
   }
 
   getUserInfo(){
-    if(!!localStorage.getItem("userSuccess")){
-      const data = JSON.parse(localStorage.getItem("userSuccess"));
+    
+    const data = this.authenticationService.getLoggedInUserInfo();
+    if(data){
       this.userInfo.client_name = data.success.nom_entreprise;
       this.userInfo.user_name = data.success.identifiant_EDISuivi;
     }

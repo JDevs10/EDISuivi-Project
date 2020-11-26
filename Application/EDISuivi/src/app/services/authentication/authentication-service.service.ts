@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { EncrDecrService } from '../encryption/encr-decr.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,12 @@ export class AuthenticationService {
   private url = `http://82.253.71.109/prod/bdc_v11_04/api/index.php`;
   private DOLAPIKEY = "3-8-13-12-7-8-24-8";
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, 
+    private router: Router,
+    private encrDecrService: EncrDecrService) { }
 
   loginForm = new FormGroup({
-    user: new FormControl('JL_test', Validators.required),
+    user: new FormControl('JL', Validators.required),
     password: new FormControl('anexys1,', Validators.required)
   });
 
@@ -25,16 +28,13 @@ export class AuthenticationService {
     // if the user token exist the return is true or else false
     let res = false;
     if(!!localStorage.getItem("userSuccess")){
-      const data = JSON.parse(localStorage.getItem("userSuccess"));
-      
-      console.log("validTime : ", data.valideData);
-
+      const data = this.getLoggedInUserInfo();
       const now = new Date();
       const valid_date = new Date(data.valideData);
 
       if(now.getTime() < valid_date.getTime()){
-        console.log("now : ", now.getTime());
-        console.log("valid_date : ", valid_date);
+        // console.log("now : ", now.getTime());
+        // console.log("valid_date : ", valid_date);
         res = true;
       }else{
         this.doLogout();
@@ -48,18 +48,28 @@ export class AuthenticationService {
     return this.http.post<any[]>(this.url_test+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
   }
 
+  createUserLocalToken(res){
+    const d = new Date();
+    const validTime = d.getTime() + 1800000;
+    const data = {
+      success: res.success, 
+      valideData: validTime
+    }
+
+    localStorage.setItem("userSuccess", this.encrDecrService.encrypt(JSON.stringify(data)));
+  }
+
   getLoggedInUserInfo(){
     if(!!localStorage.getItem("userSuccess")){
-      const data = JSON.parse(localStorage.getItem("userSuccess"));
+      const data = JSON.parse(this.encrDecrService.decrypt(localStorage.getItem("userSuccess")));
       //console.log("success : ", data.success);
-      return data.success;
+      return data;
     }
     return null;
   }
 
   doLogout() {
     localStorage.removeItem("userSuccess");
-    // window.location.href="/#/login";
  }
 
  doLogout_() {

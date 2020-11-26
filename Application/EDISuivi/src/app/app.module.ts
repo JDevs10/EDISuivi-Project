@@ -21,6 +21,8 @@ import { SuiviFacturesComponent } from './suivi-factures/suivi-factures.componen
 import { SuiviStocksComponent } from './suivi-stocks/suivi-stocks.component';
 import { SettingsComponent } from './settings/settings.component';
 import { SupportExterneComponent } from './support-externe/support-externe.component';
+import { EncrDecrService } from './services/encryption/encr-decr.service';
+import { SupportService } from './services/support/support.service';
 
 
 @NgModule({
@@ -50,6 +52,8 @@ import { SupportExterneComponent } from './support-externe/support-externe.compo
   providers: [
     AuthenticationService,
     CommandeService,
+    EncrDecrService,
+    SupportService,
     AuthGuard
   ],
   bootstrap: [AppComponent]

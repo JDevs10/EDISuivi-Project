@@ -28,7 +28,7 @@ export class SuiviCommandeComponent implements OnInit {
     {id: 3, value: 100}
   ];
 
-  user = this.authenticationService.getLoggedInUserInfo();
+  user = this.authenticationService.getLoggedInUserInfo().success;
   ordersParams = {
     socId: this.user.socid,
     status_mode: 1,
@@ -39,7 +39,7 @@ export class SuiviCommandeComponent implements OnInit {
   };
 
   orders = [
-    {rowid: 0, ref: "Chargement", platforme: "Chargement", date_creation: 123456789, date_livraison: 123456789, zip: 99999, town: "Chargement", billed: 0, statut: new Status().getLabelById(1)},
+    {rowid: 0, ref: "Chargement", platforme: "Chargement", date_creation: 123456789, date_livraison: 123456789, zip: 99999, town: "Chargement", billed: 0, total_ttc: "Chargement", statut: new Status().getLabelById(1)},
   ];
 
   constructor(public fb: FormBuilder,
@@ -80,8 +80,10 @@ export class SuiviCommandeComponent implements OnInit {
       });
     });
 
+    console.log("res : ", res);
+
     console.log("orders ", res.success);
-    this.total_cmds = res.success.total_cmd.toString();
+    this.total_cmds = res.success.total_cmd + "";
     this.current_page = res.success.current_page;
     this.total_pages = res.success.total_pages;
     var pageLabel = document.getElementById('page-current-all');

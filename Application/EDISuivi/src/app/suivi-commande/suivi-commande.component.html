@@ -47,7 +47,7 @@
         <div id="main-cmds">
             <div id="main-cmd-content">
     
-                <table class="cmd-table">
+                <table class="cmd-table" style="max-height: 600px;">
                     <thead class="cmd-table-thead">
                         <tr class="cmd-table-tbody-tr">
                             <th class="table-cell" >Référence</th>
@@ -55,17 +55,19 @@
                             <th class="table-cell" >Date de livraison</th>
                             <th class="table-cell" >Code Postal</th>
                             <th class="table-cell" >Vile</th>
+                            <th class="table-cell" >Total TTC</th>
                             <th class="table-cell" >statut</th>
                         </tr>
                     </thead>
-                    <tbody *ngFor="let order of orders">
-                        <tr class="cmd-table-tbody-tr">
+                    <tbody>
+                        <tr class="cmd-table-tbody-tr" *ngFor="let order of orders">
                             <td class="table-cell" ><a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">{{order.ref}}</a></td>
                             <td class="table-cell" >{{order.date_creation}}</td>
                             <td class="table-cell" >{{order.date_livraison}}</td>
                             <td class="table-cell" >{{order.zip}}</td>
                             <td class="table-cell" >{{order.town}}</td>
-                            <td class="table-cell" > <span>{{order.statut}}</span> </td> <!-- ngStyle="{'background-color': 'red'}" 'padding': '1px 5px 1px 5px'-->
+                            <td class="table-cell" >{{order.total_ttc}}</td>
+                            <td class="table-cell" > <span >{{order.statut}}</span> </td> <!-- ngStyle="{'background-color': 'red'}" 'padding': '1px 5px 1px 5px'-->
                         </tr>
                     </tbody>
                 </table>

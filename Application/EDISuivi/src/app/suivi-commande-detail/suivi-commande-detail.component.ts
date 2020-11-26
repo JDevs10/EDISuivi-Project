@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Router, Event, NavigationStart, NavigationEnd, NavigationError } from '@angular/router';
 import { CommandeService } from '../services/commande/commande.service';
 
 @Component({
@@ -11,42 +11,69 @@ export class SuiviCommandeDetailComponent implements OnInit {
 
   loading = true; // var to show loading UI
   show = false;   // var to show content UI after loading
+  endFirstLoad = false;
 
+  order_lines_length = 0;
   order = {
     rowid: 0,
-    ref: "",
-    client1: "",
-    client2: "",
-    assign: "",
-    deliveryAddress: "",
-    invoiceAddress: "",
-    benefitAmout: "",
-    htAmout: "",
-    tvaAmount: "",
-    ttcAmout: "x",
-    comment: "Aucun commentaire",
-    anomaly: "Aucune anomalie détectée",
-    status: "",
+    ref: "Chargement...",
+    client1: "Chargement...",
+    client2: "Chargement...",
+    assign: "Chargement...",
+    createDate: "Chargement...",
+    userCreated: "Chargement...",
+    userValidated: "Chargement...",
+    deliveryAddress: "Chargement...",
+    invoiceAddress: "Chargement...",
+    benefitAmout: "Chargement...",
+    htAmout: "Chargement...",
+    tvaAmount: "Chargement...",
+    ttcAmout: "Chargement...",
+    comment: "Chargement...",
+    anomaly: "Chargement...",
+    status: "Chargement...",
     last_main_doc: {
-      modulePart: "commande",
+      modulePart: "Chargement...",
       files: [
-        // {rowid: 0, name: "CMD201029-000414.pdf", file: "CMD201029-000414/CMD201029-000414.pdf", size: "40 ko", dateTime: "05/11/2020 11:43", downloadLink: "#"}
+        {rowid: 0, name: "Chargement...", file: "Chargement...", size: "Chargement...", dateTime: "Chargement...", downloadLink: "Chargement..."}
       ],
     },
     lines: [
-      // {rowid: 0, barecode: "5000112554359", ref: "Chargement", label: "Chargement", volume: "25 m3", weight: "45 kg", qty: 1234, unitPriceHT: 12.65, montantHT: 15610.1, tva: "5.5%", unitPriceTTC: 16468.65}
+      {rowid: 0, barecode: "Chargement...", ref: "Chargement...", label: "Chargement...", volume: "Chargement...", weight: "Chargement...", qty: "Chargement...", unitPriceHT: "Chargement...", montantHT: "Chargement...", tva: "Chargement...", unitPriceTTC: "Chargement..."}
     ]
   };
 
   constructor(private commandeService: CommandeService, private router: Router) {
-    router.changes.subscribe((val) => {
-      console.log('router : ' , val instanceof NavigationEnd);
-      // this.getOrderById();
-    });
+    router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationStart) {
+          // Show loading indicator
+          console.log('NavigationStart: ', event);
+      }
+
+      if (event instanceof NavigationEnd) {
+          // Hide loading indicator
+          // console.log('NavigationEnd: ', event);
+          if(this.endFirstLoad){
+            this.getOrderById();
+          }
+      }
+
+      if (event instanceof NavigationError) {
+          // Hide loading indicator
+
+          // Present error to user
+          console.log('NavigationError: ', event.error);
+      }
+  });
    }
 
   ngOnInit(): void {
     this.getOrderById();
+  }
+
+  back(){
+    // this.router.navigate(['suivi-commandes']);
+    window.location.href="/#/home/suivi-commandes";
   }
 
   showLoadingUI(value){
@@ -80,21 +107,25 @@ export class SuiviCommandeDetailComponent implements OnInit {
       alert("Aucune commande trouvé!");
       // return in suivi-cmd
       // this.showLoadingUI(false);
-      this.router.navigate(['../']);
+      // this.router.navigate(['../']);
+      this.endFirstLoad = true;
       return;
     }
 
     const order_lines = [];
     for(let x=0; x < res.order.lines.length; x++){
-      order_lines.push({rowid: res.order.lines[x].rowid, barecode: (res.order.lines[x].barcode == null || res.order.lines[x].barcode == "" ? "" : res.order.lines[x].barcode), ref: res.order.lines[x].ref, label: res.order.lines[x].libelle, volume: (res.order.lines[x].volume == null ? "0 " + res.order.lines[x].volume_units : res.order.lines[x].volume + " " + res.order.lines[x].volume_units), weight: (res.order.lines[x].weight == null ? "0 "+ res.order.lines[x].weight_units : res.order.lines[x].weight+" " + res.order.lines[x].weight_units), qty: res.order.lines[x].qty, unitPriceHT: res.order.lines[x].price, montantHT: res.order.lines[x].total_ht, tva: res.order.lines[x].total_tva, unitPriceTTC: res.order.lines[x].total_ttc, warehouse: "XXXXX"});
+      order_lines.push({rowid: res.order.lines[x].rowid, barecode: (res.order.lines[x].barcode == null || res.order.lines[x].barcode == "" ? "" : res.order.lines[x].barcode), ref: res.order.lines[x].ref, label: res.order.lines[x].libelle, volume: (res.order.lines[x].volume == null ? "0 " + " m3" : res.order.lines[x].volume + " m3"), weight: (res.order.lines[x].weight == null ? "0 "+ " kg" : res.order.lines[x].weight+" " + " kg"), qty: res.order.lines[x].qty, unitPriceHT: res.order.lines[x].price, montantHT: res.order.lines[x].total_ht, tva: res.order.lines[x].total_tva, unitPriceTTC: res.order.lines[x].total_ttc, warehouse: res.order.lines[x].default_warehouse});
     }
 
     this.order = {
-      rowid: res.order.id,
+      rowid: res.order.rowid,
       ref: res.order.ref,
       client1: res.order.client1,
       client2: res.order.client2,
       assign: res.order.assign,
+      createDate: res.order.createDate,
+      userCreated: res.order.userCreated,
+      userValidated: res.order.userValidated,
       deliveryAddress: (res.order.deliveryAddress == null || res.order.deliveryAddress == "" ? "Aucune adresse de livraison trouvée." : res.order.deliveryAddress),
       invoiceAddress: (res.order.invoiceAddress == null || res.order.invoiceAddress == "" ? "Aucune adresse de facturation trouvée." : res.order.invoiceAddress),
       benefitAmout: res.order.benefitAmout,
@@ -107,13 +138,16 @@ export class SuiviCommandeDetailComponent implements OnInit {
       last_main_doc: {
         modulePart: res.order.last_main_doc.modulePart,
         files: [
-          {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.downloadLink}
+          {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.dd}
         ],
       },
       lines: order_lines
     };
 
+    this.order_lines_length = this.order.lines.length;
+
     console.log("this.order ", this.order);
+    this.endFirstLoad = true;
     // this.showLoadingUI(false);
   }
 

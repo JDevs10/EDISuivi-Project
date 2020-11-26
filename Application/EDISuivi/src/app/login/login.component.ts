@@ -41,14 +41,8 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    const d = new Date();
-    const validTime = d.getTime() + 1800000;
-    const data = {
-      success: res.success, 
-      valideData: validTime
-    }
+    this.authenticationService.createUserLocalToken(res);
 
-    localStorage.setItem("userSuccess", JSON.stringify(data));
     window.location.href="#/home/dashbord";
   }
 

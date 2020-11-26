@@ -1,12 +1,12 @@
 <div style="min-height: 80vh;">
   <div id="content" style="padding: 10px; " class="container">
-    <form [formGroup]="this.supportService.supportForm" class="form-group form-signin">
+    <form [formGroup]="this.supportService.supportFormExtern" class="form-group form-signin">
       <img class="mb-4" src="assets/logo-CTM-small.png" alt="EDISuivi Icon" width="150" height="150">
       <h1 class="h3 mb-3 font-weight-normal">Support</h1>
   
       <div class="form-group"> 
         <label>Sujet du ticket</label>
-        <input type="text" formControlName="sujetTicket" class="form-control" placeholder="Veuillez donner un titre à votre problématique" required>
+        <input style="font-weight: bold;" type="text" formControlName="sujetTicket" class="form-control" placeholder="Veuillez donner un titre à votre problématique" required>
       </div>
       <div class="form-group">
         <label>Votre Entreprise</label>
@@ -18,7 +18,7 @@
       </div>
       <div style="text-align: center;">
         <div class="my-row">
-            <button id="btn-one" type="submit" (click)="sendTicket(this.supportService.supportForm.value)" class="btn btn-default bg-info" style="color: white; margin-left: 20px; margin-right: 20px;">Envoyer</button>
+            <button id="btn-one" type="submit" (click)="sendTicket(this.supportService.supportFormExtern.value)" class="btn btn-default bg-info" style="color: white; margin-left: 20px; margin-right: 20px;">Envoyer</button>
             <button id="btn-one" (click)="back()" class="btn btn-default bg-danger" style="color: white; margin-left: 20px; margin-right: 20px;">Annuler</button>
         </div>
       </div>

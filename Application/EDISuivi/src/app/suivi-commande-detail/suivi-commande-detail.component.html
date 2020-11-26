@@ -53,8 +53,9 @@
                 </div>
 
                 <div class="cmd-action">
-                    <button class="cmd-action-btn" (click)="download_bl();">Voir BL</button>
-                    <button class="cmd-action-btn" (click)="download_invoice();">Voir Facture</button>
+                    <button class="cmd-action-btn" (click)="back();">Retour</button>
+                    <button class="cmd-action-btn-block" (click)="download_bl();">Voir BL</button>
+                    <button class="cmd-action-btn-block" (click)="download_invoice();">Voir Facture</button>
                 </div>
             </div>
         
@@ -63,10 +64,10 @@
             <div class="container">
                 <div class="row">
                     <div class="" style="margin: 10px;">
-                        <span><span style="font-weight: bold;">Référence : </span>{{order.ref}}</span><br>
-                        <span><span style="font-weight: bold;">Client 1 : </span>{{order.client1}}</span><br>
-                        <span><span style="font-weight: bold;">Client 2 : </span>{{order.client2}}</span><br>
-                        <span><span style="font-weight: bold;">Assigné : </span><span style="text-decoration: underline;">{{order.assign}}</span></span><br>
+                        <span><span style="font-weight: bold;">Création de la commande : </span>{{order.createDate}}</span><br>
+                        <span><span style="font-weight: bold;">Créateur de la commande : </span>{{order.userCreated}}</span><br>
+                        <span><span style="font-weight: bold;">Validateur de la commande : </span>{{order.userValidated}}</span><br>
+                        <!-- <span><span style="font-weight: bold;">Assigné : </span><span style="text-decoration: underline;">{{order.assign}}</span></span><br> -->
                     </div>
                     <div class=" cmd-adresse">
                         <div class="header-cmd-adresse">
@@ -117,7 +118,8 @@
         
         <div style="background-color: #fff; padding: 10px; border: solid; border-width: 1px; border-color: #000;">
             <!-- <div class="my-row"> -->
-                <table class="cmd-line-table">
+                <p style="font-weight: bold; text-decoration: underline;">Produits ({{order_lines_length}})</p>
+                <table class="cmd-line-table" style="max-height: 500px;">
                     <thead class="cmd-line-table-thead">
                         <tr>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Code-bare</th>
@@ -130,12 +132,12 @@
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">TVA</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Prix TVA</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Prix TTC</th>
-                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Entrepot</th>
+                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Entrepôt</th>
                         </tr>
                     </thead>
         
-                    <tbody *ngFor="let line of order.lines">
-                        <tr class="cmd-line-table-tbody-tr">
+                    <tbody>
+                        <tr class="cmd-line-table-tbody-tr" *ngFor="let line of order.lines">
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.barecode}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.ref}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.label}}</td>
@@ -171,6 +173,7 @@
                 
                             <tbody *ngFor="let line of order.last_main_doc.files">
                                 <tr class="cmd-files-table-tbody-tr">
+                                    <!-- <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="{{line.downloadLink}}" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td> -->
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="{{line.downloadLink}}" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td>
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.size}}</td>
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.dateTime}}</td>
