@@ -1,5 +1,6 @@
 <div style="min-height: 80vh;">
 
+    <!-- CMD Loading card -->
     <!-- <div id="main-content-loading" style="width: '100%';">
         <div style="text-align: center;">
             <p style="margin: 50px; font-size: 30px; font-weight: bold;">Chargement des commandes....</p>
@@ -12,32 +13,19 @@
                 <i class="fas fa-boxes" style="margin-right: 10px;"></i>
                 <p>Liste des commandes ({{total_cmds}})</p>
             </div>
-            <div class="row ml-auto">
-                <!-- <div class="my-row borders-no-radius" style="margin: auto 5px auto 0px">
-                    <p style="margin: auto 5px;">25</p>
-                    <i class="fas fa-long-arrow-alt-down" style="margin: auto 5px;"></i>
-                </div> -->            
+            <div class="row ml-auto">       
                 
                 <div class="col-sl my-row">
                     <button class="pages" style="margin: auto 1px;" (click)="loadPreviousPage()"><i class="fas fa-angle-left fa-lg"></i> Précédente</button>
                     
                     <p id="page-current-all" style="margin: auto 3px;">NaN/NaN</p>
-    
-                    <!-- <div class="my-row" *ngFor="let page of total_pages">
-                        <button class="pages" style="margin: auto 1px;" (click)="loadSelectedPage(page)">{{page}}</button>
-                    </div> -->
                     
                     <button class="pages" style="margin: auto 1px;" (click)="loadNextPage()">Suivant <i class="fas fa-angle-right fa-lg"></i></button>
                 </div>
     
                 <form [formGroup]="this.commandeService.limitForm" class="col-sl" style="margin: auto 20px;">
                     <select id="_cmdListNb_" formControlName="limit">
-                        <!-- <option *ngFor="let page of tt_pages" value="{{page}}">{{page}}</option> -->
                         <option *ngFor="let page of tt_pages_" value="{{page.value}}">{{page.value}}</option>
-                        <!-- <option id="limit-id-0" value="25" selected>25</option>
-                        <option id="limit-id-1" value="50">50</option>
-                        <option id="limit-id-2" value="75">75</option>
-                        <option id="limit-id-3" value="100">100</option> -->
                     </select>
                     <button id="btn-one" class="pages" style="margin: 0px 0px 0px 10px;" type="submit" (click)="getOrderByLimit()"><i class="fas fa-search fa-lg"></i></button>
                 </form>
@@ -56,7 +44,7 @@
                             <th class="table-cell" >Code Postal</th>
                             <th class="table-cell" >Vile</th>
                             <th class="table-cell" >Total TTC</th>
-                            <th class="table-cell" >statut</th>
+                            <th class="table-cell" >Statut</th>
                         </tr>
                     </thead>
                     <tbody>
