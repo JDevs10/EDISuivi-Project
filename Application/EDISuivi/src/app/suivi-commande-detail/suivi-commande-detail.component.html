@@ -7,7 +7,7 @@
     </div> -->
 
     <div id="main-content-d-cmd">
-        
+
         <div style="background-color: #fff; padding: 10px; border: solid; border-width: 1px; border-color: #000;">
             <div class="my-row">
                 <div class="col-xs-10 col-sm-8 col-lg-10">
@@ -15,12 +15,12 @@
                         <div id="Header-cmd-info-1" class="container">
                             <div class="row">
                                 <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Référence : </span>{{order.ref}}</p>
-                                <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Client 1 : </span>{{order.client1}}</p>
-                                <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Client 2 : </span>{{order.client2}}</p>
+                                <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Tiers : </span>{{order.client1}}</p>
+                                <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Réf. client :  </span>{{order.client2}}</p>
                                 <p class="col-sx-6" style="padding: 5px; margin-right: 20px;"><span style="font-weight: bold;">Assigné : </span><span style="text-decoration: underline;">{{order.assign}}</span></p>
                             </div>
                         </div>
-            
+
                         <div id="Header-cmd-info-2" class="container">
                             <div class="row">
                                 <table style="width: 400px;display: block;overflow-x: auto;white-space: nowrap;">
@@ -58,7 +58,7 @@
                     <button class="cmd-action-btn-block" (click)="download_invoice();">Voir Facture</button>
                 </div>
             </div>
-        
+
             <br><br>
             <!-- col-xs-12 col-sm-5 col-md-4 col-xl-3 -->
             <div class="container">
@@ -88,13 +88,13 @@
                     <div class=""  style="margin: 10px; ">
                         <span><span style="font-weight: bold;">Montant prestation : </span>{{order.benefitAmout}} €</span><br>
                         <span><span style="font-weight: bold;">Montant HT : </span>{{order.htAmout}} €</span><br>
-                        <span><span style="font-weight: bold;">Montant TVA : </span>{{order.tvaAmount}} €</span><br> 
+                        <span><span style="font-weight: bold;">Montant TVA : </span>{{order.tvaAmount}} €</span><br>
                         <span><span style="font-weight: bold;">Montant TTC : </span>{{order.ttcAmout}} €</span><br>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="container">
             <div class="row">
                 <div class="cmd-cmmt-ame">
@@ -115,14 +115,14 @@
                 </div>
             </div>
         </div>
-        
+
         <div style="background-color: #fff; padding: 10px; border: solid; border-width: 1px; border-color: #000;">
             <!-- <div class="my-row"> -->
                 <div class="my-row">
                     <i class="fas fa-box" style="margin-right: 10px;"></i>
                     <p style="font-weight: bold; text-decoration: underline;">Produits ({{order_lines_length}})</p>
                 </div>
-                
+
                 <table class="cmd-line-table" style="max-height: 500px;">
                     <thead class="cmd-line-table-thead">
                         <tr>
@@ -139,7 +139,7 @@
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Entrepôt</th>
                         </tr>
                     </thead>
-        
+
                     <tbody>
                         <tr class="cmd-line-table-tbody-tr" *ngFor="let line of order.lines">
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.barecode}}</td>
@@ -158,7 +158,7 @@
                 </table>
             <!-- </div> -->
         </div>
-        
+
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-10 col-md-4 col-lg-4 cmd-files">
@@ -174,7 +174,7 @@
                                     <th class="table-cell" style="padding: 5px; margin-right: 5px;">Date création</th>
                                 </tr>
                             </thead>
-                
+
                             <tbody *ngFor="let line of order.last_main_doc.files">
                                 <tr class="cmd-files-table-tbody-tr">
                                     <!-- <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="{{line.downloadLink}}" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td> -->
@@ -187,12 +187,12 @@
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
-                    
+
                 </div>
             </div>
         </div>
 
     </div>
-    
+
 
 </div>
