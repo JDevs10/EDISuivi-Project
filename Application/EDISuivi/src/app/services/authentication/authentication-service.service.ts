@@ -22,8 +22,8 @@ export class AuthenticationService {
     private encrDecrService: EncrDecrService) { }
 
   loginForm = new FormGroup({
-    user: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+    user: new FormControl('JL', Validators.required),
+    password: new FormControl('anexys1,', Validators.required)
   });
 
   loggedIn(){
@@ -46,7 +46,7 @@ export class AuthenticationService {
   }
 
   doLogin(value): Observable<any[]>{
-    console.log("url : ", this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    //console.log("url : ", this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`);
     return this.http.post<any[]>(this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
   }
 

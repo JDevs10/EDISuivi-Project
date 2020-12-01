@@ -47,7 +47,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
     router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
           // Show loading indicator
-          console.log('NavigationStart: ', event);
+          // console.log('NavigationStart: ', event);
       }
 
       if (event instanceof NavigationEnd) {
@@ -62,7 +62,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
           // Hide loading indicator
 
           // Present error to user
-          console.log('NavigationError: ', event.error);
+          // console.log('NavigationError: ', event.error);
       }
   });
    }
@@ -73,7 +73,10 @@ export class SuiviCommandeDetailComponent implements OnInit {
 
   back(){
     this.router.navigate(['../home/suivi-commandes']);
+<<<<<<< HEAD
     // window.location.href="/#/home/suivi-commandes";
+=======
+>>>>>>> Filtre
   }
 
   showLoadingUI(value){
@@ -146,7 +149,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
 
     this.order_lines_length = this.order.lines.length;
 
-    console.log("this.order ", this.order);
+    // console.log("this.order ", this.order);
     this.endFirstLoad = true;
     // this.showLoadingUI(false);
   }

@@ -36,6 +36,7 @@
     border: solid; 
     border-width: 1px; 
     border-color: #000;
+    width: 450px;
     /* margin: 0 10px 0 10px; */
 }
 .header-cmd-adresse {
