@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
         await resolved(data);
       });
     });
-    console.log("tryLogin() => res : ", res);
+    // console.log("tryLogin() => res : ", res);
 
     if(res.error != null){
       alert("Error !!");

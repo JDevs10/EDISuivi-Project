@@ -32,14 +32,14 @@ export class SuiviCommandeComponent implements OnInit {
   ordersParams = {
     socId: this.user.socid,
     status_mode: 1,
-    sortfield: "cmd.rowid",
+    sortfield: "c.rowid",
     sortorder: "DESC",
     limit: this.commandeService.limitForm.value.limit,
     page: (this.current_page - 1),
   };
 
   orders = [
-    {rowid: 0, ref: "Chargement", platforme: "Chargement", date_creation: 123456789, date_livraison: 123456789, zip: 99999, town: "Chargement", billed: 0, total_ttc: "Chargement", statut: new Status().getLabelById(1)},
+    {rowid: 0, ref: "Chargement...", ref_client: "Chargement...", town: "Chargement...", zip: "Chargement...", date_creation: "Chargement...", date_livraison: "Chargement...", total_ht: "Chargement...", total_tva: "Chargement...", total_ttc: "Chargement...", statut: "Chargement...",  billed: "Chargement..."},
   ];
 
   constructor(public fb: FormBuilder,
@@ -47,7 +47,8 @@ export class SuiviCommandeComponent implements OnInit {
     public commandeService: CommandeService) { }
 
   ngOnInit(): void {
-    this.getOrders(this.ordersParams);
+    // this.getOrders(this.ordersParams);
+    this.getOrders_v3(this.ordersParams);
   }
 
   showLoadingUI(value){
@@ -66,9 +67,20 @@ export class SuiviCommandeComponent implements OnInit {
   }
 
   getOrderByLimit() {
-    console.log("limitForm ", this.commandeService.limitForm.value);
+    // console.log("limitForm ", this.commandeService.limitForm.value);
     this.ordersParams.limit = this.commandeService.limitForm.value.limit;
     this.getOrders(this.ordersParams);
+  }
+
+  getOrderFromForm(value) {
+
+    // check if limit not changed
+    if(this.ordersParams.limit != value.limit) {
+      
+    }
+
+    // check if form is empty and limit is same
+    console.log(value);
   }
 
   async getOrders(params){
@@ -76,6 +88,28 @@ export class SuiviCommandeComponent implements OnInit {
 
     const res: SuccessOrder = await new Promise(async (resolved) => {
       await this.commandeService.getOrders(params).subscribe(async (data) => {
+        await resolved(data);
+      });
+    });
+
+    // console.log("res : ", res);
+
+    // console.log("orders ", res.success);
+    this.total_cmds = res.success.total_cmd + "";
+    this.current_page = res.success.current_page;
+    this.total_pages = res.success.total_pages;
+    var pageLabel = document.getElementById('page-current-all');
+    pageLabel.innerText = (this.current_page + 1)+"/"+this.total_pages;
+    this.orders = res.success.cmds;
+
+    // this.showLoadingUI(false);
+  }
+
+  async getOrders_v3(params){
+    // this.showLoadingUI(true);
+
+    const res: SuccessOrder = await new Promise(async (resolved) => {
+      await this.commandeService.getOrders_v3(params).subscribe(async (data) => {
         await resolved(data);
       });
     });
@@ -97,7 +131,7 @@ export class SuiviCommandeComponent implements OnInit {
     // this.showLoadingUI(true);
     const previousPage = (this.current_page - 1);
     if(previousPage > -1){
-      console.log("loadPreviousPage => "+previousPage);
+      // console.log("loadPreviousPage => "+previousPage);
       this.ordersParams.page = previousPage;
       
       var pageLabel = document.getElementById('page-current-all');
@@ -112,7 +146,7 @@ export class SuiviCommandeComponent implements OnInit {
 
     const nextPage = (this.current_page + 1);
     if(nextPage < this.total_pages){
-      console.log("loadPreviousPage => "+nextPage);
+      // console.log("loadPreviousPage => "+nextPage);
       this.ordersParams.page = nextPage;
       
       var pageLabel = document.getElementById('page-current-all');
