@@ -277,10 +277,10 @@ class EDISuiviApi extends DolibarrApi
     {
 		$result;
 		/*
-		$sql = "SELECT cmd.rowid, cmd.ref, cmd.date_creation, cmd.date_livraison, soc.zip, soc.town, exp.billed, cmd.fk_statut ";
-		$sql .= "FROM llx_commande as cmd, llx_societe as soc, llx_expedition as exp, llx_element_element as el ";
-		$sql .= "WHERE cmd.fk_soc = soc.rowid AND el.fk_source = cmd.rowid AND el.fk_target = exp.rowid AND el.targettype = 'shipping' ";
-		//$sql .= "AND cmd.fk_soc = $socId ";
+		$sql_v1 = "SELECT cmd.rowid, cmd.ref, cmd.date_creation, cmd.date_livraison, soc.zip, soc.town, exp.billed, cmd.fk_statut ";
+		$sql_v1 .= "FROM llx_commande as cmd, llx_societe as soc, llx_expedition as exp, llx_element_element as el ";
+		$sql_v1 .= "WHERE cmd.fk_soc = soc.rowid AND el.fk_source = cmd.rowid AND el.fk_target = exp.rowid AND el.targettype = 'shipping' ";
+		//$sql_v1 .= "AND cmd.fk_soc = $socId ";
 		*/
 		
 		//v2
@@ -288,6 +288,13 @@ class EDISuiviApi extends DolibarrApi
 		$sql .= "FROM llx_commande as cmd, llx_societe as soc ";
 		$sql .= "WHERE cmd.fk_soc = soc.rowid ";
 		$sql .= "AND cmd.fk_soc = $socId ";
+		
+		$sql_v3 = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
+		$sql_v3 .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
+		$sql_v3 .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
+		$sql_v3 .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
+		$sql_v3 .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
+		$sql_v3 .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1)";
 		
 		
 		$sql.= $this->db->order($sortfield, $sortorder);
@@ -314,18 +321,112 @@ class EDISuiviApi extends DolibarrApi
 			while($row = $this->db->fetch_array($sql)){
 				//print("<pre>".print_r($row, true)."</pre>"); 
 				
+				
+				// sql_v2
 				$result[$index]['rowid'] = $row['rowid'];
 				$result[$index]['ref'] = $row['ref'];
 				$result[$index]['date_creation'] = $row['date_creation'];
 				$result[$index]['date_livraison'] = $row['date_livraison'];
 				$result[$index]['zip'] = $row['zip'];
 				$result[$index]['town'] = $row['town'];
-				//$result[$index]['billed'] = ($row['billed']);
 				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
 				$result[$index]['statut'] = $this->getStatusLabel($row['fk_statut'], -99, $status_mode);
 				
-				//$result[$index]['zip_'] = $this->getOrderDeliveryAddressZip($row['rowid']);
-				//$result[$index]['town_'] = $this->getOrderDeliveryAddressTown($row['rowid']);
+				$index++;
+			}
+		}
+		else{
+			return array(
+			"error" => array(
+				"message" => "Aucune commande trouve.",
+			)
+		);
+		}
+		
+		//print("<pre>".print_r($result, true)."</pre>");
+		
+		return array(
+			"success" => array(
+				"total_cmd" => $total_cmd,
+				"limit" => $limit,
+				"current_page" => $page,
+				"total_pages" => $this->getTotalPages($sql_, $limit),
+				"cmds" => $result
+			)
+		);
+    }
+	
+	/**
+     * Get a list of orders
+     *
+     * Return an array with orders informations
+     *
+     * @param 	int 	$socId 			ID of entreprise
+	 * @param 	int 	$status_mode 	0 = Long label, 1 = Short label
+	 * @param 	string	$sortfield	    Sort field
+     * @param 	string	$sortorder	    Sort order
+	 * @param 	int		$limit		    Limit for list
+     * @param 	int		$page		    Page number
+	 * @param 	string	$filter			Filter
+     * @return 	array|mixed 			data without useless information
+     *
+     * @url	GET orders/of-user/v3
+     * @throws 	RestException
+     */
+    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = "{'test': 1, 'test2': 'Hey', 'test3': 15.66}")
+    {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
+	
+		print("<pre>".print_r($filter, true)."</pre>");
+		die();
+		$result;
+		
+		$sql = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
+		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
+		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
+		$sql .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
+		$sql .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
+		$sql .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1) "; 
+		
+		
+		$sql.= $this->db->order($sortfield, $sortorder);
+		$sql_ = $sql;
+		if ($limit)	{
+            if ($page < 0) {
+                $page = 0;
+            }
+            $offset = $limit * $page;
+			//print " || limit: ".($limit)." & offset: ".$offset."|| ";
+
+            $sql.= $this->db->plimit($limit, $offset);
+        }
+		
+		//print("<pre>".print_r($sql, true)."</pre>");
+		//die();
+		
+		$res = $this->db->query($sql); 
+		
+		$index = 0;
+		$total_cmd = $res->num_rows;
+		if ($total_cmd > 0) {
+			
+			while($row = $this->db->fetch_array($sql)){
+				//print("<pre>".print_r($row, true)."</pre>"); 
+				
+				
+				// sql_v3
+				$result[$index]['rowid'] = $row['rowid'];
+				$result[$index]['ref'] = $row['ref'];
+				$result[$index]['client_name'] = $row['name'];
+				$result[$index]['ref_client'] = $row['ref_client'];
+				$result[$index]['town'] = $row['town'];
+				$result[$index]['zip'] = $row['zip'];
+				$result[$index]['date_creation'] = $row['date_creation'];
+				$result[$index]['date_livraison'] = $row['date_livraison'];
+				$result[$index]['total_ht'] = round($row['total_ht'], 3);
+				$result[$index]['total_tva'] = round($row['total_tva'], 3);
+				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
+				$result[$index]['statut'] = $this->getStatusLabel($row['fk_statut'], $row['billed'], $status_mode);
+				$result[$index]['billed'] = ($row['billed'] == 0 ? "Non" : $row['billed'] == 1 ? "Oui" : "NaN");
 				
 				$index++;
 			}
@@ -543,7 +644,7 @@ class EDISuiviApi extends DolibarrApi
 					"deliveryDate" => $row['date_livraison'],
 					"deliveryAddress" => $this->getOrderDeliveryAddress($id),
 					"invoiceAddress" => $this->getOrderInvoiceAddress($id),
-					"benefitAmout" => "xxxxxx",
+					"benefitAmout" => "15.0",
 					"htAmout" => round($row['total_ht'], 3),
 					"tvaAmount" => round($row['total_tva'], 3),
 					"ttcAmout" => round($row['total_ttc'], 3),

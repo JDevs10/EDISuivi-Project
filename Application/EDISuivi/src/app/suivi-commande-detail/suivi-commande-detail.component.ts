@@ -72,8 +72,8 @@ export class SuiviCommandeDetailComponent implements OnInit {
   }
 
   back(){
-    // this.router.navigate(['suivi-commandes']);
-    window.location.href="/#/home/suivi-commandes";
+    this.router.navigate(['../home/suivi-commandes']);
+    // window.location.href="/#/home/suivi-commandes";
   }
 
   showLoadingUI(value){
