@@ -641,7 +641,6 @@ class EDISuiviApi extends DolibarrApi
 			
 			while($row = $this->db->fetch_array($sql)){
 				//print("<pre>".print_r($row, true)."</pre>");
-				//die();
 				
 				$cmd = array(
 					"rowid" => $row['rowid'],

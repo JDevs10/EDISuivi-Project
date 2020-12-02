@@ -132,8 +132,8 @@ export class SuiviCommandeDetailComponent implements OnInit {
       htAmout: res.order.htAmout,
       tvaAmount: res.order.tvaAmount,
       ttcAmout: res.order.ttcAmout,
-      comment: (res.order.note_public == null || res.order.note_public == "" ? "Aucun commentaire." : res.order.note_public),
-      anomaly: (res.order.note_private == null || res.order.note_private == "" ? "Aucune anomalie détectée." : res.order.note_private),
+      comment: (res.order.comment == null || res.order.comment == "" ? "Aucun commentaire." : res.order.comment),
+      anomaly: (res.order.anomaly == null || res.order.anomaly == "" ? "Aucune anomalie détectée." : res.order.anomaly),
       status: res.order.status,
       last_main_doc: {
         modulePart: res.order.last_main_doc.modulePart,
