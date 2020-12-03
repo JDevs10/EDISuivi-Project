@@ -38,13 +38,7 @@ export class SuiviCommandeComponent implements OnInit {
     page: (this.current_page - 1),
   };
 
-<<<<<<< HEAD
   orders = [];
-=======
-  orders = [
-    {rowid: 0, ref: "Chargement...", ref_client: "Chargement...", town: "Chargement...", zip: "Chargement...", date_creation: "Chargement...", date_livraison: "Chargement...", total_ht: "Chargement...", total_tva: "Chargement...", total_ttc: "Chargement...", statut: "Chargement...",  billed: "Chargement..."},
-  ];
->>>>>>> Filtre
 
   constructor(public fb: FormBuilder,
     private authenticationService: AuthenticationService,
