@@ -39,6 +39,7 @@
                     <thead class="cmd-table-thead">
                         <tr class="cmd-table-tbody-tr">
                             <th class="table-cell" >Référence</th>
+                            <th class="table-cell" >Réf. Client</th>
                             <th class="table-cell" >Saisie le</th>
                             <th class="table-cell" >Date de livraison</th>
                             <th class="table-cell" >Code Postal</th>
@@ -50,6 +51,7 @@
                     <tbody>
                         <tr class="cmd-table-tbody-tr" *ngFor="let order of orders">
                             <td class="table-cell" ><a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">{{order.ref}}</a></td>
+                            <td class="table-cell" >{{order.date_creation}}</td>
                             <td class="table-cell" >{{order.date_creation}}</td>
                             <td class="table-cell" >{{order.date_livraison}}</td>
                             <td class="table-cell" >{{order.zip}}</td>

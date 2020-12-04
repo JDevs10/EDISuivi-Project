@@ -510,7 +510,7 @@ class EDISuiviApi extends DolibarrApi
 		
 		$sql = "SELECT CONCAT(spp.civility, ' ', spp.lastname, ' ', spp.firstname, ', ', spp.address, ', ', spp.zip, ', ', country.label) as adress ";
 		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_country as country ";
-		$sql .= "WHERE c.element_id = 12027 AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'SHIPPING' AND spp.fk_pays = country.rowid";
+		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'SHIPPING' AND spp.fk_pays = country.rowid";
 		
 		$result = "";
 		$res = $this->db->query($sql);
@@ -533,7 +533,7 @@ class EDISuiviApi extends DolibarrApi
 		*/
 		$sql = "SELECT CONCAT(spp.civility, ' ', spp.lastname, ' ', spp.firstname, ', ', spp.address, ', ', spp.zip, ', ', country.label) as adress ";
 		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_country as country ";
-		$sql .= "WHERE c.element_id = 12027 AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'BILLING' AND spp.fk_pays = country.rowid";
+		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'BILLING' AND spp.fk_pays = country.rowid";
 		
 		
 		$result = "";
@@ -657,7 +657,7 @@ class EDISuiviApi extends DolibarrApi
 					"deliveryDate" => $row['date_livraison'],
 					"deliveryAddress" => $this->getOrderDeliveryAddress($id),
 					"invoiceAddress" => $this->getOrderInvoiceAddress($id),
-					"benefitAmout" => "15.0",
+					//"benefitAmout" => "15.0",
 					"htAmout" => round($row['total_ht'], 3),
 					"tvaAmount" => round($row['total_tva'], 3),
 					"ttcAmout" => round($row['total_ttc'], 3),
