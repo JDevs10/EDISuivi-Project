@@ -334,6 +334,13 @@ class EDISuiviApi extends DolibarrApi
 		$sql .= "WHERE cmd.fk_soc = soc.rowid ";
 		$sql .= "AND cmd.fk_soc = $socId ";
 		
+		$sql_v3 = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
+		$sql_v3 .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
+		$sql_v3 .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
+		$sql_v3 .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
+		$sql_v3 .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
+		$sql_v3 .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1)";
+		
 		
 		$sql.= $this->db->order($sortfield, $sortorder);
 		$sql_ = $sql;
