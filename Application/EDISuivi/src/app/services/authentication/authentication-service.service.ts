@@ -22,8 +22,8 @@ export class AuthenticationService {
     private encrDecrService: EncrDecrService) { }
 
   loginForm = new FormGroup({
-    user: new FormControl('JL', Validators.required),
-    password: new FormControl('anexys1,', Validators.required)
+    user: new FormControl('', Validators.required),
+    password: new FormControl('', Validators.required)
   });
 
   loggedIn(){

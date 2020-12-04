@@ -21,6 +21,9 @@ export class SuiviCommandeDetailComponent implements OnInit {
     client2: "Chargement...",
     assign: "Chargement...",
     createDate: "Chargement...",
+    validDate: "Chargement...",
+    deliveryDate: "Chargement...",
+    receptionDate: "Chargement...",
     userCreated: "Chargement...",
     userValidated: "Chargement...",
     deliveryAddress: "Chargement...",
@@ -35,11 +38,11 @@ export class SuiviCommandeDetailComponent implements OnInit {
     last_main_doc: {
       modulePart: "Chargement...",
       files: [
-        {rowid: 0, name: "Chargement...", file: "Chargement...", size: "Chargement...", dateTime: "Chargement...", downloadLink: "Chargement..."}
+        // {rowid: 0, name: "Chargement...", file: "Chargement...", size: "Chargement...", dateTime: "Chargement...", downloadLink: "Chargement..."}
       ],
     },
     lines: [
-      {rowid: 0, barecode: "Chargement...", ref: "Chargement...", label: "Chargement...", volume: "Chargement...", weight: "Chargement...", qty: "Chargement...", unitPriceHT: "Chargement...", montantHT: "Chargement...", tva: "Chargement...", unitPriceTTC: "Chargement..."}
+      // {rowid: 0, barecode: "Chargement...", ref: "Chargement...", label: "Chargement...", volume: "Chargement...", weight: "Chargement...", qty: "Chargement...", unitPriceHT: "Chargement...", montantHT: "Chargement...", tva: "Chargement...", unitPriceTTC: "Chargement..."}
     ]
   };
 
@@ -73,6 +76,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
 
   back(){
     this.router.navigate(['../home/suivi-commandes']);
+    // window.location.href="/#/home/suivi-commandes";
   }
 
   showLoadingUI(value){
@@ -116,6 +120,18 @@ export class SuiviCommandeDetailComponent implements OnInit {
       order_lines.push({rowid: res.order.lines[x].rowid, barecode: (res.order.lines[x].barcode == null || res.order.lines[x].barcode == "" ? "" : res.order.lines[x].barcode), ref: res.order.lines[x].ref, label: res.order.lines[x].libelle, volume: (res.order.lines[x].volume == null ? "0 " + " m3" : res.order.lines[x].volume + " m3"), weight: (res.order.lines[x].weight == null ? "0 "+ " kg" : res.order.lines[x].weight+" " + " kg"), qty: res.order.lines[x].qty, unitPriceHT: res.order.lines[x].price, montantHT: res.order.lines[x].total_ht, tva: res.order.lines[x].total_tva, unitPriceTTC: res.order.lines[x].total_ttc, warehouse: res.order.lines[x].default_warehouse});
     }
 
+    // set delivery adress
+    // check in extrafields_data for custom fields
+    let deliveryAddress;
+    let receptionDate;
+    if(res.order.extrafields_data != null){
+      deliveryAddress = (res.order.extrafields_data.deliveryAddress_custom == null ? "Aucune adresse de livraison trouvée." : res.order.extrafields_data.deliveryAddress_custom);
+      receptionDate = (res.order.extrafields_data.receptionDate_custom == null ? "" : res.order.extrafields_data.receptionDate_custom);
+    }else{
+      deliveryAddress = "Aucune adresse de livraison trouvée.";
+      receptionDate = "";
+    }
+
     this.order = {
       rowid: res.order.rowid,
       ref: res.order.ref,
@@ -123,21 +139,24 @@ export class SuiviCommandeDetailComponent implements OnInit {
       client2: res.order.client2,
       assign: res.order.assign,
       createDate: res.order.createDate,
+      validDate: res.order.validDate,
+      deliveryDate: res.order.deliveryDate,
+      receptionDate: receptionDate,
       userCreated: res.order.userCreated,
       userValidated: res.order.userValidated,
-      deliveryAddress: (res.order.deliveryAddress == null || res.order.deliveryAddress == "" ? "Aucune adresse de livraison trouvée." : res.order.deliveryAddress),
+      deliveryAddress: deliveryAddress,
       invoiceAddress: (res.order.invoiceAddress == null || res.order.invoiceAddress == "" ? "Aucune adresse de facturation trouvée." : res.order.invoiceAddress),
       benefitAmout: res.order.benefitAmout,
       htAmout: res.order.htAmout,
       tvaAmount: res.order.tvaAmount,
       ttcAmout: res.order.ttcAmout,
-      comment: (res.order.note_public == null || res.order.note_public == "" ? "Aucun commentaire." : res.order.note_public),
-      anomaly: (res.order.note_private == null || res.order.note_private == "" ? "Aucune anomalie détectée." : res.order.note_private),
+      comment: (res.order.comment == null || res.order.comment == "" ? "Aucun commentaire." : res.order.comment),
+      anomaly: (res.order.anomaly == null || res.order.anomaly == "" ? "Aucune anomalie détectée." : res.order.anomaly),
       status: res.order.status,
       last_main_doc: {
         modulePart: res.order.last_main_doc.modulePart,
         files: [
-          {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.dd}
+          // {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.dd}
         ],
       },
       lines: order_lines

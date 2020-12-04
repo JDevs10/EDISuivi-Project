@@ -189,7 +189,7 @@ class EDISuiviApi extends DolibarrApi
 	 *  @param      int     $donotshowbilled  Do not show billed status after order status
 	 *  @return     string					  Label of status
 	 */
-	function getStatusLabel($id, $billed, $mode, $lang = "FR"){
+	function getStatusLabel($id, $billed, $mode){
 		
 		$STOCK_NOT_ENOUGH_FOR_ORDER = -3; 	// ERR Not enough stock
 		$STATUS_CANCELED = -1; 			// Canceled status
@@ -205,87 +205,42 @@ class EDISuiviApi extends DolibarrApi
 		
 		switch ($id) {
 			case $STOCK_NOT_ENOUGH_FOR_ORDER:
-				if($lang == "FR"){
-					$labelStatus = "Commande Annule";
-					$labelStatusShort = "Annule";
-				}else{
-					$labelStatus = "Order Canceled";
-					$labelStatusShort = "Canceled";
-				}
+				$labelStatus = "Order Canceled";
+				$labelStatusShort = "Canceled";
 				break;
 			case $STATUS_CANCELED:
-				if($lang == "FR"){
-					$labelStatus = "Commande Annule";
-					$labelStatusShort = "Annule";
-				}else{
-					$labelStatus = "Order Canceled";
-					$labelStatusShort = "Canceled";
-				}
+				$labelStatus = "Order Canceled";
+				$labelStatusShort = "Canceled";
 				break;
 			case $STATUS_DRAFT:
-				if($lang == "FR"){
-					$labelStatus = "Broullion";
-					$labelStatusShort = "Broullion";
-				}else{
-					$labelStatus = "Draft (needs to be validated)";
-					$labelStatusShort = "Draft";
-				}
+				$labelStatus = "Draft (needs to be validated)";
+				$labelStatusShort = "Draft";
 				break;
 			case $STATUS_VALIDATED:
-				if($lang == "FR"){
-					$labelStatus = "Commande Valide";
-					$labelStatusShort = "Valide";
-				}else{
-					$labelStatus = "Order Validated";
-					$labelStatusShort = "Validated";
-				}
+				$labelStatus = "Order Validated";
+				$labelStatusShort = "Validated";
 				break;
 			case $STATUS_SHIPMENTONPROCESS:
-				if($lang == "FR"){
-					$labelStatus = "Commande en cours";
-					$labelStatusShort = "En cours";
-				}else{
-					$labelStatus = "Order Shipment in process";
-					$labelStatusShort = "Order In process";
-				}
+				$labelStatus = "Order Shipment in process";
+				$labelStatusShort = "Order In process";
 				break;
 			case $STATUS_CLOSED:
 				if($billed != -99){
 					if(!$billed && empty($conf->global->WORKFLOW_BILL_ON_SHIPMENT)){
-						if($lang == "FR"){
-							$labelStatus = "Commande livree";
-							$labelStatusShort = "Livree";
-						}else{
-							$labelStatus = "Order Delivered";
-							$labelStatusShort = "Delivered";
-						}
-					}
-					elseif ($billed && empty($conf->global->WORKFLOW_BILL_ON_SHIPMENT)){
-						if($lang == "FR"){
-							$labelStatus = "Commande Traitee";
-							$labelStatusShort = "Traite";
-						}else{
-							$labelStatus = "Order Processed";
-							$labelStatusShort = "Processed";
-						}
-					}
-					elseif (!empty($conf->global->WORKFLOW_BILL_ON_SHIPMENT)){
-						if($lang == "FR"){
-							$labelStatus = "Commande livree";
-							$labelStatusShort = "Livree";
-						}else{
-							$labelStatus = "Order Delivered";
-							$labelStatusShort = "Delivered";
-						}
-					}
-				}else {
-					if($lang == "FR"){
-						$labelStatus = "Commande livree";
-						$labelStatusShort = "Livree";
-					}else{
 						$labelStatus = "Order Delivered";
 						$labelStatusShort = "Delivered";
 					}
+					elseif ($billed && empty($conf->global->WORKFLOW_BILL_ON_SHIPMENT)){
+						$labelStatus = "Order Processed";
+						$labelStatusShort = "Processed";
+					}
+					elseif (!empty($conf->global->WORKFLOW_BILL_ON_SHIPMENT)){
+						$labelStatus = "Order Delivered";
+						$labelStatusShort = "Delivered";
+					}
+				}else {
+					$labelStatus = "Order Delivered";
+					$labelStatusShort = "Delivered";
 				}
 				break;
 			default:
@@ -333,6 +288,13 @@ class EDISuiviApi extends DolibarrApi
 		$sql .= "FROM llx_commande as cmd, llx_societe as soc ";
 		$sql .= "WHERE cmd.fk_soc = soc.rowid ";
 		$sql .= "AND cmd.fk_soc = $socId ";
+		
+		$sql_v3 = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
+		$sql_v3 .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
+		$sql_v3 .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
+		$sql_v3 .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
+		$sql_v3 .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
+		$sql_v3 .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1)";
 		
 		
 		$sql.= $this->db->order($sortfield, $sortorder);
@@ -414,8 +376,8 @@ class EDISuiviApi extends DolibarrApi
     public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = "{'test': 1, 'test2': 'Hey', 'test3': 15.66}")
     {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
 	
-		//print("<pre>".print_r($filter, true)."</pre>");
-		//die();
+		print("<pre>".print_r($filter, true)."</pre>");
+		die();
 		$result;
 		
 		$sql = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
@@ -458,8 +420,8 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['ref_client'] = $row['ref_client'];
 				$result[$index]['town'] = $row['town'];
 				$result[$index]['zip'] = $row['zip'];
-				$result[$index]['date_creation'] = ($row['date_creation'] == "" ? : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_creation'])) );
-				$result[$index]['date_livraison'] = ($row['date_delivery'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_delivery'])) );
+				$result[$index]['date_creation'] = $row['date_creation'];
+				$result[$index]['date_livraison'] = $row['date_livraison'];
 				$result[$index]['total_ht'] = round($row['total_ht'], 3);
 				$result[$index]['total_tva'] = round($row['total_tva'], 3);
 				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
@@ -539,32 +501,17 @@ class EDISuiviApi extends DolibarrApi
 
 	
 	private function getOrderDeliveryAddress($id){
+		/*
+		$sql = "SELECT CONCAT(spp.address, ', ', spp.zip, ', ', depart.nom, ', ', country.label) as adress ";
+		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_departements as depart, llx_c_regions as regions, llx_c_country as country ";
+		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'SHIPPING' ";
+		$sql .= "AND spp.fk_departement = depart.rowid AND depart.fk_region = regions.rowid AND spp.fk_pays = country.rowid";
+		*/
 		
 		$sql = "SELECT CONCAT(spp.civility, ' ', spp.lastname, ' ', spp.firstname, ', ', spp.address, ', ', spp.zip, ', ', country.label) as adress ";
 		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_country as country ";
-		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'SHIPPING' AND spp.fk_pays = country.rowid";
+		$sql .= "WHERE c.element_id = 12027 AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'SHIPPING' AND spp.fk_pays = country.rowid";
 		
-		$result = "";
-		$res = $this->db->query($sql);
-		$rows = $res->num_rows;
-		if($rows > 0) {
-			while($row = $this->db->fetch_array($sql)){
-				$result = $row['adress'];
-				break;
-			}
-		}
-		return $result;
-	}
-	
-	private function getSocieteAddress($id){
-		
-		$sql = "SELECT CONCAT(s.nom, ', ', s.address, ', ', s.town, ', ', s.zip, ', ', country.label) as adress ";
-		$sql .= "FROM llx_societe as s, llx_c_country as country ";
-		$sql .= "WHERE s.rowid = $id AND s.fk_pays = country.rowid";
-		
-		//print("<pre>".print_r($sql, true)."</pre>");
-		//die();
-		 
 		$result = "";
 		$res = $this->db->query($sql);
 		$rows = $res->num_rows;
@@ -578,10 +525,15 @@ class EDISuiviApi extends DolibarrApi
 	}
 	
 	private function getOrderInvoiceAddress($id){ 
-		
+		/*
+		$sql = "SELECT CONCAT(spp.address, ', ', spp.zip, ', ', depart.nom, ', ', country.label) as adress ";
+		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_departements as depart, llx_c_regions as regions, llx_c_country as country ";
+		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'BILLING' ";
+		$sql .= "AND spp.fk_departement = depart.rowid AND depart.fk_region = regions.rowid AND spp.fk_pays = country.rowid";
+		*/
 		$sql = "SELECT CONCAT(spp.civility, ' ', spp.lastname, ' ', spp.firstname, ', ', spp.address, ', ', spp.zip, ', ', country.label) as adress ";
 		$sql .= "FROM llx_element_contact as c, llx_c_type_contact as tc, llx_socpeople as spp, llx_c_country as country ";
-		$sql .= "WHERE c.element_id = $id AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'BILLING' AND spp.fk_pays = country.rowid";
+		$sql .= "WHERE c.element_id = 12027 AND c.fk_c_type_contact = tc.rowid AND c.fk_socpeople = spp.rowid AND tc.element = 'commande' AND tc.code = 'BILLING' AND spp.fk_pays = country.rowid";
 		
 		
 		$result = "";
@@ -671,7 +623,7 @@ class EDISuiviApi extends DolibarrApi
 		//error_reporting(E_ALL);
 		//ini_set('display_errors', '1');
 		 
-		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, c.fk_statut, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
+		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, c.fk_statut, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
 		 $sql .= "FROM llx_commande as c LEFT JOIN llx_c_payment_term as cr ON c.fk_cond_reglement = cr.rowid LEFT JOIN llx_c_paiement as p ON c.fk_mode_reglement = p.id LEFT JOIN llx_c_availability as ca ON c.fk_availability = ca.rowid LEFT JOIN llx_c_input_reason as dr ON c.fk_input_reason = dr.rowid LEFT JOIN llx_c_incoterms as i ON c.fk_incoterms = i.rowid ";
 		 $sql .= "WHERE c.rowid=$id";
 		 
@@ -689,22 +641,21 @@ class EDISuiviApi extends DolibarrApi
 			
 			while($row = $this->db->fetch_array($sql)){
 				//print("<pre>".print_r($row, true)."</pre>");
-				//die();
 				
 				$cmd = array(
 					"rowid" => $row['rowid'],
 					"ref" => $row['ref'],
 					"client1" => $row['fk_soc'],
-					"client2" => $row['ref_client'],
+					"client2" => "",
 					"assign" => ($row['fk_socpeople'] == null || $row['fk_socpeople'] == "" ? "" : $row['fk_socpeople']),
 					"userCreated" => $row['fk_user_author'],
 					"userValidated" => $row['fk_user_valid'],
-					"createDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_creation'])),
-					"modifyDate" => ($row['tms'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['tms'])) ),
-					"validDate" => ($row['date_valid'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_valid'])) ),
-					"deliveryDate" => ($row['date_livraison'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_livraison'])) ),
+					"createDate" => $row['date_creation'],
+					"modifyDate" => $row['tms'],
+					"validDate" => $row['date_valid'],
+					"deliveryDate" => $row['date_livraison'],
 					"deliveryAddress" => $this->getOrderDeliveryAddress($id),
-					"invoiceAddress" => $this->getSocieteAddress($row['fk_soc_id']),
+					"invoiceAddress" => $this->getOrderInvoiceAddress($id),
 					"benefitAmout" => "15.0",
 					"htAmout" => round($row['total_ht'], 3),
 					"tvaAmount" => round($row['total_tva'], 3),
@@ -727,27 +678,6 @@ class EDISuiviApi extends DolibarrApi
 					"lines" => array(),
 				);
 			}
-			
-			
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// get extrafields data /////////////////////////////////////////////////////////////////////////////////////////
-			$sql_extra = "SELECT * FROM llx_commande_extrafields WHERE fk_object = $id";
-			$res = $this->db->query($sql_extra);
-			$total_extra = $res->num_rows;
-			$extrafields_data = null; 
-			
-			if($total_extra > 0){
-				$row = $this->db->fetch_array($sql_extra);
-				
-				//print("<pre>".print_r($sql_extra, true)."</pre>");
-				//die();
-				
-				$extrafields_data = array(
-					"receptionDate_custom" => strftime("%d-%m-%Y %Hh%M", strtotime($row['dateentry'])),				// date de reception
-					"deliveryAddress_custom" => $row['adresseship']		// adress de reception de la commande
-				);
-			}
-			
 			
 			
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -847,7 +777,6 @@ class EDISuiviApi extends DolibarrApi
 			}
 			
 			//print("<pre>".print_r($lines, true)."</pre>");
-			$cmd['extrafields_data'] = $extrafields_data; 
 			$cmd['lines'] = $lines;
 			
 			
@@ -870,8 +799,6 @@ class EDISuiviApi extends DolibarrApi
 		);
 	 }
 	 
-
-
 	 
 	 /**
 	 * Download a document.

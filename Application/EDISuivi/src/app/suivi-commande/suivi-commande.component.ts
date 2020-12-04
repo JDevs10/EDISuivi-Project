@@ -16,7 +16,7 @@ export class SuiviCommandeComponent implements OnInit {
 
   loading = true; // var to show loading UI
   show = false;   // var to show content UI after loading
-  total_cmds = "NaN";
+  total_cmds = "Aucun";
   current_page: number = 1;
   total_pages = 1;
   nbOFcmdInList: string = "";
@@ -38,9 +38,7 @@ export class SuiviCommandeComponent implements OnInit {
     page: (this.current_page - 1),
   };
 
-  orders = [
-    {rowid: 0, ref: "Chargement...", ref_client: "Chargement...", town: "Chargement...", zip: "Chargement...", date_creation: "Chargement...", date_livraison: "Chargement...", total_ht: "Chargement...", total_tva: "Chargement...", total_ttc: "Chargement...", statut: "Chargement...",  billed: "Chargement..."},
-  ];
+  orders = [];
 
   constructor(public fb: FormBuilder,
     private authenticationService: AuthenticationService,
@@ -121,7 +119,7 @@ export class SuiviCommandeComponent implements OnInit {
     this.current_page = res.success.current_page;
     this.total_pages = res.success.total_pages;
     var pageLabel = document.getElementById('page-current-all');
-    pageLabel.innerText = (this.current_page + 1)+"/"+this.total_pages;
+    pageLabel.innerText = (this.current_page + 1)+"/"+(this.total_pages + 1);
     this.orders = res.success.cmds;
 
     // this.showLoadingUI(false);
@@ -135,7 +133,7 @@ export class SuiviCommandeComponent implements OnInit {
       this.ordersParams.page = previousPage;
       
       var pageLabel = document.getElementById('page-current-all');
-      pageLabel.innerText = previousPage+"/"+this.total_pages;
+      pageLabel.innerText = previousPage+"/"+(this.total_pages + 1);
       this.getOrders(this.ordersParams);
     }
     // this.showLoadingUI(false);
@@ -150,7 +148,7 @@ export class SuiviCommandeComponent implements OnInit {
       this.ordersParams.page = nextPage;
       
       var pageLabel = document.getElementById('page-current-all');
-      pageLabel.innerText = nextPage +"/"+this.total_pages;
+      pageLabel.innerText = nextPage +"/"+(this.total_pages + 1);
       this.getOrders(this.ordersParams);
     }
 
