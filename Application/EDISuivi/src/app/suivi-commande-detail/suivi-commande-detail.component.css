@@ -30,12 +30,32 @@
     display: none;
 }
 
+.cmd-table-thead {
+    border: solid; 
+    border-width: 1px; 
+    background-color: rgb(233,234,237); 
+    border-left: none; 
+    border-right: none;
+}
+
+
+.cmd-table-tbody-tr {
+    border: solid; 
+    border-width: 1px; 
+    /* background-color: rgb(233,234,237);  */
+    border-left: none; 
+    border-right: none;
+}
+
+
+
 .cmd-adresse {
     margin: auto;
     padding: 0;
     border: solid; 
     border-width: 1px; 
     border-color: #000;
+    width: 400px;
     /* margin: 0 10px 0 10px; */
 }
 .header-cmd-adresse {
@@ -61,7 +81,7 @@
 }
 
 .cmd-cmmt-ame {
-    min-width: 500px;
+    width: 650px;
     min-height: 150px;
     margin-left: auto;
     margin-right: auto;

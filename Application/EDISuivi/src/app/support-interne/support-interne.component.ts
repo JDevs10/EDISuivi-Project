@@ -32,18 +32,18 @@ export class SupportInterneComponent implements OnInit {
     const res: any = await new Promise(async (resolved) => {
       await this.supportService.sendTicket(data).subscribe({
         next: async (data) => {
-          console.log('Successful data: ', data);
+          // console.log('Successful data: ', data);
           await resolved(data);
         },
         error: async (error) => {
             // this.errorMessage = error.message;
-            console.error('There was an error! ', error);
+            // console.error('There was an error! ', error);
             await resolved(null);
         }
       });
     });
 
-    console.log("res : ", res);
+    // console.log("res : ", res);
 
     if(res == null){
       alert("Une erreur s'est produite lors de l'envoi du ticket.");

@@ -23,42 +23,69 @@
                     <button class="pages" style="margin: auto 1px;" (click)="loadNextPage()">Suivant <i class="fas fa-angle-right fa-lg"></i></button>
                 </div>
     
-                <form [formGroup]="this.commandeService.limitForm" class="col-sl" style="margin: auto 20px;">
-                    <select id="_cmdListNb_" formControlName="limit">
-                        <option *ngFor="let page of tt_pages_" value="{{page.value}}">{{page.value}}</option>
-                    </select>
-                    <button id="btn-one" class="pages" style="margin: 0px 0px 0px 10px;" type="submit" (click)="getOrderByLimit()"><i class="fas fa-search fa-lg"></i></button>
-                </form>
+                
             </div>
         </div>
     
         <div id="main-cmds">
             <div id="main-cmd-content">
-    
-                <table class="cmd-table" style="max-height: 600px;">
-                    <thead class="cmd-table-thead">
-                        <tr class="cmd-table-tbody-tr">
-                            <th class="table-cell" >Référence</th>
-                            <th class="table-cell" >Saisie le</th>
-                            <th class="table-cell" >Date de livraison</th>
-                            <th class="table-cell" >Code Postal</th>
-                            <th class="table-cell" >Ville</th>
-                            <th class="table-cell" >Total TTC</th>
-                            <th class="table-cell" >Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="cmd-table-tbody-tr" *ngFor="let order of orders">
-                            <td class="table-cell" ><a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">{{order.ref}}</a></td>
-                            <td class="table-cell" >{{order.date_creation}}</td>
-                            <td class="table-cell" >{{order.date_livraison}}</td>
-                            <td class="table-cell" >{{order.zip}}</td>
-                            <td class="table-cell" >{{order.town}}</td>
-                            <td class="table-cell" >{{order.total_ttc}}</td>
-                            <td class="table-cell" > <span >{{order.statut}}</span> </td> <!-- ngStyle="{'background-color': 'red'}" 'padding': '1px 5px 1px 5px'-->
-                        </tr>
-                    </tbody>
-                </table>
+
+                <form [formGroup]="this.commandeService.filterForm" class="form-group form-filter">
+                    <table class="cmd-table" style="max-height: 600px;">
+                        <thead class="cmd-table-thead">
+                            <!-- <tr class="cmd-table-tbody-tr">
+                                <th class="table-cell" ><input type="ref" formControlName="ref" class="form-control" placeholder="Référence" required> </th>
+                                <th class="table-cell" ><input type="ref_client" formControlName="ref_client" class="form-control" placeholder="Réf. Client" required></th>
+                                <th class="table-cell" ><input type="town" formControlName="town" class="form-control" placeholder="Ville" required> </th>
+                                <th class="table-cell" ><input type="zip" formControlName="zip" class="form-control" placeholder="Code Postal" required> </th>
+                                <th class="table-cell" ><input type="creation_date" formControlName="creation_date" class="form-control" placeholder="Saisie le" required> </th>
+                                <th class="table-cell" ><input type="delivery_date" formControlName="delivery_date" class="form-control" placeholder="Date de livraison" required> </th>
+                                <th class="table-cell" ><input type="total_ht" formControlName="total_ht" class="form-control" placeholder="Total HT" required> </th>
+                                <th class="table-cell" ><input type="total_tva" formControlName="total_tva" class="form-control" placeholder="Total TVA" required> </th>
+                                <th class="table-cell" ><input type="total_ttc" formControlName="total_ttc" class="form-control" placeholder="Total TTC" required> </th>
+                                <th class="table-cell" ><input type="statut" formControlName="statut" class="form-control" placeholder="Statut" required> </th>
+                                <th class="table-cell" ><input type="billed" formControlName="billed" class="form-control" placeholder="Facturé" required> </th>
+                                <th class="table-cell-action" > 
+                                    <select id="_cmdListNb_" formControlName="limit">
+                                        <option *ngFor="let page of tt_pages_" value="{{page.value}}">{{page.value}}</option>
+                                    </select>
+                                    <button id="btn-one" class="pages" style="margin: 0px 0px 0px 10px;" type="submit" (click)="getOrderFromForm(this.commandeService.filterForm.value)"><i class="fas fa-search fa-lg"></i></button>   
+                                </th>
+                            </tr> -->
+                            <tr class="cmd-table-tbody-tr">
+                                <th class="table-cell" >Référence.</th>
+                                <th class="table-cell" >Réf. Client</th>
+                                <th class="table-cell" >Ville</th>
+                                <th class="table-cell" >Code Postal</th>
+                                <th class="table-cell" >Saisie le</th>
+                                <th class="table-cell" >Date de livraison</th>
+                                <th class="table-cell" >Total HT</th>
+                                <th class="table-cell" >Total TVA</th>
+                                <th class="table-cell" >Total TTC</th>
+                                <th class="table-cell" >Statut</th>
+                                <th class="table-cell" >Facturé</th>
+                                <th class="table-cell-action" ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="cmd-table-tbody-tr" *ngFor="let order of orders">
+                                <td class="table-cell" ><a style="margin: auto;" routerLink="../suivi-commande-detail/{{order.rowid}}">{{order.ref}}</a></td>
+                                <td class="table-cell" >{{order.ref_client}}</td>
+                                <td class="table-cell" >{{order.town}}</td>
+                                <td class="table-cell" >{{order.zip}}</td>
+                                <td class="table-cell" >{{order.date_creation}}</td>
+                                <td class="table-cell" >{{order.date_livraison}}</td>
+                                <td class="table-cell" >{{order.total_ht}}</td>
+                                <td class="table-cell" >{{order.total_tva}}</td>
+                                <td class="table-cell" >{{order.total_ttc}}</td>
+                                <td class="table-cell" > <span >{{order.statut}}</span> </td> <!-- ngStyle="{'background-color': 'red'}" 'padding': '1px 5px 1px 5px'-->
+                                <td class="table-cell" >{{order.billed}}</td>
+                                <td class="table-cell-action" ></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                
             </div>
             <div id="main-cmd-loading">
                 
