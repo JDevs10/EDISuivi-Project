@@ -1,0 +1,82 @@
+
+<nav class="navbar navbar-expand-lg navbar-absolute bg-primary fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-wrapper">
+            <div class="navbar-toggle">
+                <button type="button" class="navbar-toggler" (click)="sidebarToggle()">
+                    <span class="navbar-toggler-bar bar1"></span>
+                    <span class="navbar-toggler-bar bar2"></span>
+                    <span class="navbar-toggler-bar bar3"></span>
+                </button>
+            </div>
+            <a class="navbar-brand" href="#pablo">{{getTitle()}}</a>
+        </div>
+        <button class="navbar-toggler" type="button" (click)="collapse()"
+          [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+          <span class="navbar-toggler-bar navbar-kebab"></span>
+          <span class="navbar-toggler-bar navbar-kebab"></span>
+          <span class="navbar-toggler-bar navbar-kebab"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="collapseExample"> <!-- [ngbCollapse]="isCollapsed" -->
+          <form>
+            <div class="input-group no-border">
+              <input type="text" value="" class="form-control" placeholder="Search...">
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </div>
+              </div>
+            </div>
+          </form>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle core-color-text-color" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="far fa-user fa-2x"></i>
+                &nbsp;{{userInfo.user_name}}
+              </a>
+              <!-- <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" routerLink="support-interne">Support</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" (click)="this.authenticationService.doLogout_();">Déconnexion</a>
+              </div> -->
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <!-- User image -->
+                <div class="user-header">
+                    <img class="photo dropdown-user-image" alt="No photo" src="/public/theme/common/user_anonymous.png">
+                    <p>
+                      <i class="far fa-star classfortooltip" title="Administrateur"></i> SuperAdmin (admin)<br>
+                      <small class="classfortooltip" title="Connexion précédente"><i class="fa fa-user-clock"></i> 11/12/2020 08:59</small><br>
+                      <small class="classfortooltip"><i class="fa fa-cog"></i> Version EDISuivi - BIG DATA CONSULTING 1.3.6</small>
+                    </p>
+                </div>
+      
+                <!-- Menu Body -->
+                <div class="user-body">
+                  <span id="topmenuloginmoreinfo-btn"><i class="fa fa-caret-right"></i> Afficher plus d'informations</span>
+                  <div id="topmenuloginmoreinfo" style="display: none;"><br>
+                    <b>Administrateur</b>: Oui<br>
+                    <b>Type:</b> Interne<br>
+                    <b>État</b>: Actif<br><br>
+                  </div>
+                </div>
+  
+                <!-- Menu Footer-->
+                <div class="user-footer">
+                    <div class="pull-left">
+                        <a class="dropdown-item" routerlink="support-interne"><i class="fa fa-user"></i>  Support</a>
+                    </div>
+                    <div class="pull-right">
+                        <a class="dropdown-item" ><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+      
+              </div>
+            </li>
+          </ul>
+        </div>
+    </div>
+</nav>

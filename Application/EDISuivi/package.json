@@ -1,6 +1,6 @@
 {
   "name": "edisuivi",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -16,14 +16,38 @@
     "@angular/compiler": "~11.0.0",
     "@angular/core": "~11.0.0",
     "@angular/forms": "~11.0.0",
+    "@angular/http": "7.2.16",
+    "@angular/localize": "^9.0.6",
     "@angular/platform-browser": "~11.0.0",
     "@angular/platform-browser-dynamic": "~11.0.0",
+    "@angular/platform-server": "9.0.6",
     "@angular/router": "~11.0.0",
+    "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "@types/crypto-js": "^4.0.1",
+    "ajv": "6.12.0",
+    "ajv-keywords": "3.4.1",
+    "bootstrap": "^4.5.3",
+    "chart.js": "2.7.3",
+    "chartist": "0.11.0",
+    "classlist.js": "1.1.20150312",
+    "copy-webpack-plugin": "4.6.0",
+    "core-js": "3.6.4",
     "crypto-js": "^4.0.0",
+    "font-awesome": "4.7.0",
+    "hammerjs": "2.0.8",
+    "jquery": "^3.5.1",
+    "jw-bootstrap-switch-ng2": "2.0.4",
     "ng-form-group": "^1.4.2",
+    "ng2-charts": "1.6.0",
+    "ngx-toastr": "12.0.0",
+    "nouislider": "12.1.0",
+    "perfect-scrollbar": "1.4.0",
+    "popper.js": "1.14.6",
+    "rellax": "1.7.2",
     "rxjs": "^6.6.3",
+    "sass": "^1.30.0",
     "tslib": "^2.0.0",
+    "web-animations-js": "2.3.1",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
@@ -43,9 +67,15 @@
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~4.0.2"
+    "typescript": "~4.0.2",
+    "@angular/language-service": "9.0.6",
+    "@types/bootstrap": "4.2.1",
+    "@types/chartist": "0.9.43",
+    "@types/googlemaps": "3.30.16",
+    "@types/jquery": "3.3.29",
+    "karma-cli": "2.0.0"
   },
   "browser": {
-      "crypto": false
+    "crypto": false
   }
 }

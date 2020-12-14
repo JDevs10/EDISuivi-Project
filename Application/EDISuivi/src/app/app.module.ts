@@ -23,6 +23,8 @@ import { SettingsComponent } from './settings/settings.component';
 import { SupportExterneComponent } from './support-externe/support-externe.component';
 import { EncrDecrService } from './services/encryption/encr-decr.service';
 import { SupportService } from './services/support/support.service';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
 
 @NgModule({
@@ -40,6 +42,8 @@ import { SupportService } from './services/support/support.service';
     SuiviStocksComponent,
     SettingsComponent,
     SupportExterneComponent,
+    SidebarComponent,
+    NavbarComponent,
   ],
   imports: [
     BrowserModule,

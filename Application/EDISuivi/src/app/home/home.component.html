@@ -1,5 +1,5 @@
-<div style="position: relative; min-height: 100vh;">
-    <header>
+<!-- <div style="position: relative; min-height: 100vh;"> -->
+    <!-- <header>
         <app-header></app-header>
     </header>
     
@@ -9,6 +9,21 @@
     
     <footer style="text-align: center;">
         <app-footer></app-footer>
-    </footer> 
-</div>
+    </footer>  -->
+    <!-- <p>Hello Home</p> -->
+
+
+    <div class="wrapper">
+        <div class="sidebar" data-color="default">
+            <app-sidebar></app-sidebar>
+        </div>
+        <div class="main-panel">
+            <app-navbar></app-navbar>
+            <!-- <app-header></app-header> -->
+            <router-outlet></router-outlet>
+            <app-footer></app-footer>
+        </div>
+    </div>
+
+<!-- </div> -->
 
