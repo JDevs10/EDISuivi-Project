@@ -1,3 +1,9 @@
+@media screen and (min-width: 990px){
+    #panel-header-empty {
+        height: 65px !important;
+    }
+}
+
 @media screen and (max-width: 991px){
     .profile-photo .profile-photo-small{
         margin-left: -2px;
@@ -43,7 +49,7 @@
 
         .dropdown.show .dropdown-menu,
         .dropdown .dropdown-menu{
-            background-color: transparent;
+            // background-color: transparent;
             border: 0;
             transition: none;
             -webkit-box-shadow: none;

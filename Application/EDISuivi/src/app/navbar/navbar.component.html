@@ -1,5 +1,4 @@
-
-<nav class="navbar navbar-expand-lg navbar-absolute bg-primary fixed-top">
+<nav class="navbar navbar-expand-lg navbar-absolute bg-primary fixed-top navbar-transparent">
     <div class="container-fluid">
         <div class="navbar-wrapper">
             <div class="navbar-toggle">
@@ -11,8 +10,7 @@
             </div>
             <a class="navbar-brand" href="#pablo">{{getTitle()}}</a>
         </div>
-        <button class="navbar-toggler" type="button" (click)="collapse()"
-          [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+        <button class="navbar-toggler" type="button" (click)="collapse()" [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
           <span class="navbar-toggler-bar navbar-kebab"></span>
           <span class="navbar-toggler-bar navbar-kebab"></span>
           <span class="navbar-toggler-bar navbar-kebab"></span>
@@ -29,7 +27,7 @@
             </div>
           </form>
           <ul class="navbar-nav">
-            <li class="nav-item">
+            <li id="li-space" class="nav-item">
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </li>
             <li class="nav-item dropdown">
@@ -44,34 +42,34 @@
               </div> -->
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                 <!-- User image -->
-                <div class="user-header">
-                    <img class="photo dropdown-user-image" alt="No photo" src="/public/theme/common/user_anonymous.png">
-                    <p>
-                      <i class="far fa-star classfortooltip" title="Administrateur"></i> SuperAdmin (admin)<br>
-                      <small class="classfortooltip" title="Connexion précédente"><i class="fa fa-user-clock"></i> 11/12/2020 08:59</small><br>
-                      <small class="classfortooltip"><i class="fa fa-cog"></i> Version EDISuivi - BIG DATA CONSULTING 1.3.6</small>
-                    </p>
+                <div class="dropdown-user-header">
+                  <img class="photo dropdown-user-image" alt="No photo" src="assets/user_anonymous.png">
+                  <p style="width: '100%';">
+                    <i class="far fa-star classfortooltip" title="Administrateur"></i> {{userInfo.user_name}} (admin)<br>
+                    <small class="classfortooltip" title="Connexion précédente"><i class="fa fa-user-clock"></i> {{userInfo.last_connexion}}</small><br>
+                    <small class="classfortooltip"><i class="fa fa-cog"></i> Version EDISuivi - BDC 1.3.6</small>
+                  </p>
                 </div>
       
                 <!-- Menu Body -->
-                <div class="user-body">
-                  <span id="topmenuloginmoreinfo-btn"><i class="fa fa-caret-right"></i> Afficher plus d'informations</span>
-                  <div id="topmenuloginmoreinfo" style="display: none;"><br>
-                    <b>Administrateur</b>: Oui<br>
-                    <b>Type:</b> Interne<br>
+                <div class="dropdown-user-body">
+                  <p>
+                    <b>Administrateur</b>: {{userInfo.userIsAdmin}}<br>
+                    <!-- <b>Type:</b> Interne<br> -->
                     <b>État</b>: Actif<br><br>
-                  </div>
+                  </p>
                 </div>
   
                 <!-- Menu Footer-->
-                <div class="user-footer">
-                    <div class="pull-left">
-                        <a class="dropdown-item" routerlink="support-interne"><i class="fa fa-user"></i>  Support</a>
-                    </div>
-                    <div class="pull-right">
-                        <a class="dropdown-item" ><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
-                    </div>
-                    <div style="clear:both;"></div>
+                <div class="dropdown-user-footer">
+                  <div class="pull-left">
+                      <a class="dropdown-item button-top-menu-dropdown" href="/#/home/support-interne"><i class="fa fa-user"></i>  Support</a>
+                      <!-- <a href="/prod/bdc_v11_04/user/card.php?id=1" class="button-top-menu-dropdown"><i class="fa fa-user"></i>  Fiche</a> -->
+                  </div>
+                  <div class="pull-right">
+                      <a class="dropdown-item button-top-menu-dropdown" (click)="this.authenticationService.doLogout_();"><i class="fa fa-sign-out-alt"></i> Déconnexion</a>
+                  </div>
+                  <div style="clear:both;"></div>
                 </div>
       
               </div>

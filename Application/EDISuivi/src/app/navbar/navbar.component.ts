@@ -3,6 +3,7 @@ import { ROUTES } from '../sidebar/sidebar.component';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
 import { Router } from '@angular/router';
 import Chart from 'chart.js';
+import { AuthenticationService } from '../services/authentication/authentication-service.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,19 +16,22 @@ export class NavbarComponent implements OnInit {
   mobile_menu_visible: any = 0;
   private toggleButton: any;
   private sidebarVisible: boolean;
-  private userInfo = {
+  public userInfo = {
     client_name: 'NomClient',
-    user_name: 'Nothing'
+    user_name: 'Nothing',
+    last_connexion: '',
+    userIsAdmin: 'Non'
   }
 
-  public isCollapsed = true;
+  public isCollapsed = false;
 
-  constructor(location: Location,  private element: ElementRef, private router: Router) {
+  constructor(location: Location,  private element: ElementRef, private router: Router, public authenticationService: AuthenticationService) {
     this.location = location;
         this.sidebarVisible = false;
   }
 
   ngOnInit(): void {
+    this.getUserInfo();
     this.listTitles = ROUTES.filter(listTitle => listTitle);
       const navbar: HTMLElement = this.element.nativeElement;
       this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0];
@@ -41,19 +45,43 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  getUserInfo(){
+    
+    const data = this.authenticationService.getLoggedInUserInfo();
+    if(data){
+      this.userInfo.client_name = data.success.nom_entreprise;
+      this.userInfo.user_name = data.success.identifiant_EDISuivi;
+      const dateNoSeconds = data.success.last_connexion.split(':');
+      this.userInfo.last_connexion = dateNoSeconds[0]+":"+dateNoSeconds[1]+":"+dateNoSeconds[2];
+
+      if(data.success.identifiant_EDISuivi == "admin" || data.success.identifiant_EDISuivi == "JL"){
+        this.userInfo.userIsAdmin = "Oui";
+      }
+    }
+  }
+
 
   collapse(){
+    console.log('before', this.isCollapsed);
       this.isCollapsed = !this.isCollapsed;
-      const navbar = document.getElementsByTagName('nav')[0];
-      console.log(navbar);
-      if (!this.isCollapsed) {
-        navbar.classList.remove('navbar-transparent');
-        navbar.classList.add('bg-white');
-      }else{
-        navbar.classList.add('navbar-transparent');
-        navbar.classList.remove('bg-white');
-      }
+      console.log('after', this.isCollapsed);
 
+      const panel = document.getElementById("panel-header-empty");
+      const navbar_ = document.getElementById("collapseExample");
+      if (!this.isCollapsed) {
+        document.getElementById("li-space").classList.add("nav-item");
+        document.getElementById("li-space").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        navbar_.classList.remove('show');
+        panel.style.height = "65px";
+        // navbar_.style.backgroundColor = "transparent";
+      }else{
+        document.getElementById("li-space").classList.remove("nav-item");
+        document.getElementById("li-space").innerHTML = "";
+        navbar_.classList.add('show');
+        // navbar_.style.backgroundColor = "#000000";
+        navbar_.style.color = "#000000";
+        panel.style.height = "200px"
+      }
     }
 
     sidebarOpen() {

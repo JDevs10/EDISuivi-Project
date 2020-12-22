@@ -63,7 +63,7 @@ export class AuthenticationService {
     const d = new Date();
     const validTime = d.getTime() + 1800000;
     const data = {
-      success: res.success, 
+      success: res.success,
       valideData: validTime
     }
 

@@ -7,39 +7,6 @@
     text-align: center; 
     width: '100%';
 }
-.diamond-shape {
-    background-color: #fff;
-    height: 100px;
-    width:100px;
-    text-align: center;
-    transform:rotate(45deg);
-    box-shadow: 0px 0px 12px gray;
-    border-radius: 5px;
-}
-.diamond-shape:hover{
-    background-color: #3c6389;
-}
-.diamond-shape-unavailable {
-    background-color: gray;
-    height: 100px;
-    width:100px;
-    text-align: center;
-    transform:rotate(45deg);
-    box-shadow: 0px 0px 12px gray;
-    border-radius: 5px;
-}
-.item-count {
-    font-weight: bold;
-    color: #333;
-    display: table-cell;
-    height: 100px;
-    width:100px;
-    transform: rotate(-45deg);
-    vertical-align: middle;
-}
-.item-count:hover{
-    color: #fff;
-}
 
 @media (max-width: 1200px){
     .container_{
@@ -63,21 +30,5 @@
     .container_{
         margin: 100px auto 0px auto;
         max-width: 400px;
-    }
-
-    .diamond-shape {
-        height: 90px;
-        width:90px;
-    }
-
-    .diamond-shape-unavailable {
-        height: 90px;
-        width:90px;
-    }
-
-    .item-count {
-        height: 90px;
-        width: 90px;
-        font-size: 17px;
     }
 }

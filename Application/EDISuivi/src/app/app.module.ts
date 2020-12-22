@@ -25,6 +25,8 @@ import { EncrDecrService } from './services/encryption/encr-decr.service';
 import { SupportService } from './services/support/support.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { MyChartComponent } from './my-chart/my-chart.component';
+import { SuiviBonLivraisonComponent } from './suivi-bon-livraison/suivi-bon-livraison.component';
 
 
 @NgModule({
@@ -44,6 +46,8 @@ import { NavbarComponent } from './navbar/navbar.component';
     SupportExterneComponent,
     SidebarComponent,
     NavbarComponent,
+    MyChartComponent,
+    SuiviBonLivraisonComponent,
   ],
   imports: [
     BrowserModule,
