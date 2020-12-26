@@ -49,6 +49,7 @@ export class NavbarComponent implements OnInit {
     
     const data = this.authenticationService.getLoggedInUserInfo();
     if(data){
+      // console.log('nav data :', data);
       this.userInfo.client_name = data.success.nom_entreprise;
       this.userInfo.user_name = data.success.identifiant_EDISuivi;
       const dateNoSeconds = data.success.last_connexion.split(':');

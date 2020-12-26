@@ -67,6 +67,8 @@ export class AuthenticationService {
       valideData: validTime
     }
 
+    // console.log(data);
+
     localStorage.setItem("userSuccess", this.encrDecrService.encrypt(JSON.stringify(data)));
   }
 

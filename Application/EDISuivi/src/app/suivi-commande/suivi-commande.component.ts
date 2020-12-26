@@ -21,6 +21,9 @@ export class SuiviCommandeComponent implements OnInit {
   total_pages = 1;
   nbOFcmdInList: string = "";
   seletedCmdListValue = '12';
+  statuts = [
+    {label: "", value: 0}
+  ];
   tt_pages_ = [
     {id: 0, value: 25}, 
     {id: 1, value: 50}, 
@@ -36,6 +39,7 @@ export class SuiviCommandeComponent implements OnInit {
     sortorder: "DESC",
     limit: this.commandeService.limitForm.value.limit,
     page: (this.current_page - 1),
+    filter: {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
   };
 
   orders = [];
@@ -45,8 +49,14 @@ export class SuiviCommandeComponent implements OnInit {
     public commandeService: CommandeService) { }
 
   ngOnInit(): void {
+    this.loadStatus();
     // this.getOrders(this.ordersParams);
     this.getOrders_v3(this.ordersParams);
+  }
+
+  loadStatus(){
+    const status = new Status();
+    this.statuts = status.getStatus();
   }
 
   showLoadingUI(value){
@@ -64,23 +74,28 @@ export class SuiviCommandeComponent implements OnInit {
     this.show = !value;
   }
 
+  /*
   getOrderByLimit() {
     // console.log("limitForm ", this.commandeService.limitForm.value);
-    this.ordersParams.limit = this.commandeService.limitForm.value.limit;
+    this.ordersParams.limit = this.commandeService.filterForm.value.limit;
     this.getOrders(this.ordersParams);
   }
+  */
 
   getOrderFromForm(value) {
 
     // check if limit not changed
-    if(this.ordersParams.limit != value.limit) {
+    // if(this.ordersParams.limit != value.limit) {
       
-    }
+    // }
 
     // check if form is empty and limit is same
     console.log(value);
+    this.ordersParams.filter = value;
+    this.getOrders_v3(this.ordersParams);
   }
 
+  /*
   async getOrders(params){
     // this.showLoadingUI(true);
 
@@ -101,7 +116,7 @@ export class SuiviCommandeComponent implements OnInit {
     this.orders = res.success.cmds;
 
     // this.showLoadingUI(false);
-  }
+  }*/
 
   async getOrders_v3(params){
     // this.showLoadingUI(true);
@@ -134,7 +149,7 @@ export class SuiviCommandeComponent implements OnInit {
       
       var pageLabel = document.getElementById('page-current-all');
       pageLabel.innerText = previousPage+"/"+(this.total_pages + 1);
-      this.getOrders(this.ordersParams);
+      this.getOrders_v3(this.ordersParams);
     }
     // this.showLoadingUI(false);
   }
@@ -149,7 +164,7 @@ export class SuiviCommandeComponent implements OnInit {
       
       var pageLabel = document.getElementById('page-current-all');
       pageLabel.innerText = nextPage +"/"+(this.total_pages + 1);
-      this.getOrders(this.ordersParams);
+      this.getOrders_v3(this.ordersParams);
     }
 
     // this.showLoadingUI(false);

@@ -1,9 +1,10 @@
 const _status_ = [
-    {id: 1, label: "Brouillon", bg_color: "#00AAFF", color: "#ffffff"},
-    {id: 2, label: "Validé", bg_color: "7DFF7D", color: "#ffffff"},
-    {id: 3, label: "En cours", bg_color: "FF7D00", color: "#ffffff"},
-    {id: 4, label: "En livraison", bg_color: "00FF00", color: "#ffffff"},
-    {id: 5, label: "Annulé", bg_color: "FF0000", color: "#ffffff"},
+    {id: -99, label: "", value: -99, bg_color: "", color: ""},
+    {id: 1, label: "Brouillon", value: 0, bg_color: "#00AAFF", color: "#ffffff"},
+    {id: 2, label: "Validé", value: 1, bg_color: "7DFF7D", color: "#ffffff"},
+    {id: 3, label: "En cours", value: 2, bg_color: "FF7D00", color: "#ffffff"},
+    // {id: 4, label: "En livraison", value: "", bg_color: "00FF00", color: "#ffffff"},
+    {id: 5, label: "Annulé", value: -1, bg_color: "FF0000", color: "#ffffff"},
 ];
 
 export class Status {

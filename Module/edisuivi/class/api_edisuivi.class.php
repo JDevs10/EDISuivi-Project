@@ -123,7 +123,7 @@ class EDISuiviApi extends DolibarrApi
 		}
 		*/
 		
-		$sql_ = "SELECT user.ref, user.identifiant, user.user_type, ent.label, ent.nb_commandes, soc.rowid as socid, soc.nom, soc.code_client, soc.code_fournisseur, u.api_key ";
+		$sql_  = "SELECT user.ref, user.identifiant, user.last_connexion, user.user_type, ent.label, ent.nb_commandes, soc.rowid as socid, soc.nom, soc.code_client, soc.code_fournisseur, u.api_key ";
 		$sql_ .= "FROM llx_edisuivi_utilisateur as user, llx_edisuivi_entreprise as ent, llx_societe as soc, llx_user as u ";
 		$sql_ .= "WHERE user.identifiant = '".$login."' AND user.fk_entreprise = ent.rowid AND ent.fk_soc = soc.rowid AND u.login = 'edisuivi' AND u.lastname = 'edisuivi'";
 		//print "SQL => ".$sql_; 
@@ -138,6 +138,7 @@ class EDISuiviApi extends DolibarrApi
 				$login_info = array(
 					'ref_user_EDISuivi' => $row['ref'],
 					'identifiant_EDISuivi' => $row['identifiant'],
+					'last_connexion' => $row['last_connexion'],
 					'user_type_EDISuivi' => $row['user_type'],
 					'nom_entreprise_EDISuivi' => $row['label'],
 					'nb_commandes' => $row['nb_commandes'],
@@ -149,10 +150,16 @@ class EDISuiviApi extends DolibarrApi
 				);
 			}
 			
+			$date = new DateTime();
+			$last_connexion__ = strftime("%Y-%m-%d %H:%M:%S", $date->getTimestamp() );
+			$sql__ = "UPDATE llx_edisuivi_utilisateur SET last_connexion = '$last_connexion__' WHERE identifiant = '$login'";
+			$res__ = $this->db->query($sql__);
+			
 			return array(
 					'success' => array(
 						'ref_user_EDISuivi' => $login_info['ref_user_EDISuivi'],
 						'identifiant_EDISuivi' => $login_info['identifiant_EDISuivi'],
+						'last_connexion' => $login_info['last_connexion'],
 						'user_type_EDISuivi' => $login_info['user_type_EDISuivi'],
 						'nom_entreprise_EDISuivi' => $login_info['nom_entreprise_EDISuivi'],
 						'nb_commandes' => $login_info['nb_commandes'],
@@ -174,6 +181,42 @@ class EDISuiviApi extends DolibarrApi
 		}
 		
 		//print("<pre>".print_r($resql,true)."</pre>"); 
+	}
+	
+	
+	
+	/*##########################################################################################################################*/
+	/*########################################  Gestion Api Charts  ##########################################################*/
+	
+	/**
+	 *	Return Top 5 most ordered products
+	 *
+	 *  @url	GET chart/top-5-most-ordered-products/
+     *  @throws 	RestException
+	 */
+	public function getTop5MostOrderedProducts(){
+		$result;
+		$sql  = "SELECT p.label, counting_best.n from (SELECT fk_product, count(fk_product) as n FROM `llx_commandedet` WHERE fk_product is not NULL GROUP by fk_product ORDER BY n desc LIMIT 5) as counting_best, llx_product as p ";
+		$sql .= "WHERE counting_best.fk_product = p.rowid";
+		
+		$index = 0;
+		$res = $this->db->query($sql);
+		if ($res->num_rows > 0) {
+			while($row = $this->db->fetch_array($sql_)){
+				print("<pre>".print_r($row, true)."</pre>");
+				
+				$result[$index]['label'] = $row['label'];
+				$result[$index]['nb'] = $row['n'];
+				
+				$index++;
+			}
+		}
+		
+		return array(
+			"success" => array(
+				"data" => $result,
+			)
+		);
 	}
 	
 	
@@ -334,13 +377,6 @@ class EDISuiviApi extends DolibarrApi
 		$sql .= "WHERE cmd.fk_soc = soc.rowid ";
 		$sql .= "AND cmd.fk_soc = $socId ";
 		
-		$sql_v3 = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
-		$sql_v3 .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
-		$sql_v3 .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
-		$sql_v3 .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
-		$sql_v3 .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
-		$sql_v3 .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1)";
-		
 		
 		$sql.= $this->db->order($sortfield, $sortorder);
 		$sql_ = $sql;
@@ -412,31 +448,146 @@ class EDISuiviApi extends DolibarrApi
      * @param 	string	$sortorder	    Sort order
 	 * @param 	int		$limit		    Limit for list
      * @param 	int		$page		    Page number
-	 * @param 	string	$filter			Filter
+	 * @param 	string	$filter		 	Exp:{'test': 1, 'test2': 'Hey', 'test3': 15.66}
      * @return 	array|mixed 			data without useless information
      *
      * @url	GET orders/of-user/v3
      * @throws 	RestException
      */
-    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = "{'test': 1, 'test2': 'Hey', 'test3': 15.66}")
+    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = '{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}')
     {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
+		// {"ref":"","ref_client":"JL","town":"","zip":"","creation_date":"","delivery_date":"2020-12-28","total_ht":"","total_tva":"","total_ttc":"","statut":"1","billed":"0","limit":"25"}
+		// {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+
+		$filter = json_decode($filter, true);
 	
-		//print("<pre>".print_r($filter, true)."</pre>");
+		$isFirst = false;
+		$str_filter = "";
+		
+		if($filter['ref'] == ""){
+			$str_filter .= "";
+		}else {
+			$isFirst = true;
+			$str_filter .= "c.ref = '".$filter['ref']."' AND ";
+		}
+		
+		if($filter['ref_client'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.ref_client = '".$filter['ref_client']."' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.ref_client = '".$filter['ref_client']."' AND ";
+			}
+		}
+		
+		if($filter['town'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND s.town = '".$filter['town']."' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "s.town = '".$filter['town']."' AND ";
+			}
+		}
+		
+		if($filter['creation_date'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.date_creation LIKE '".$filter['creation_date']." %' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.date_creation LIKE '".$filter['creation_date']." %' AND ";
+			}
+		}
+		
+		if($filter['delivery_date'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.date_livraison  LIKE '".$filter['delivery_date']." %' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.date_livraison LIKE '".$filter['delivery_date']." %' AND ";
+			}
+		}
+		
+		if($filter['total_ht'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.total_ht = ".$filter['total_ht']." ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.total_ht = ".$filter['total_ht']." AND ";
+			}
+		}
+		
+		if($filter['total_tva'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.tva = ".$filter['total_tva']." ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.tva = ".$filter['total_tva']." AND ";
+			}
+		}
+		
+		if($filter['total_ttc'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.total_ttc = ".$filter['total_ttc']." ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.total_ttc = ".$filter['total_ttc']." AND ";
+			}
+		}
+		
+		if($filter['statut'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.fk_statut = ".$filter['statut']." ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.fk_statut = ".$filter['statut']." AND ";
+			}
+		}
+		
+		if($filter['billed'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.facture = ".$filter['billed'];
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.facture = ".$filter['billed']." AND";
+			}
+		}
+		
+		$limit = $filter['limit'];
+		
+		//print("<pre>".print_r($str_filter)."</pre>");
 		//die();
+		
 		$result;
 		
-		$sql = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
+		$sql  = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
 		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
 		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
 		$sql .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
 		$sql .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
-		$sql .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND c.entity IN (1) "; 
-		
+		$sql .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND $str_filter c.entity IN (1) "; 
 		
 		$sql.= $this->db->order($sortfield, $sortorder);
 		$sql_ = $sql;
 		if ($limit)	{
-            if ($page < 0) {
+            if ($page < 0) { 
                 $page = 0;
             }
             $offset = $limit * $page;
@@ -480,11 +631,9 @@ class EDISuiviApi extends DolibarrApi
 			return array(
 			"error" => array(
 				"message" => "Aucune commande trouve.",
-			)
-		);
+				)
+			);
 		}
-		
-		//print("<pre>".print_r($result, true)."</pre>");
 		
 		return array(
 			"success" => array(
@@ -565,13 +714,13 @@ class EDISuiviApi extends DolibarrApi
 	
 	private function getSocieteAddress($id){
 		
-		$sql = "SELECT CONCAT(s.nom, ', ', s.address, ', ', s.town, ', ', s.zip, ', ', country.label) as adress ";
+		$sql = "SELECT CONCAT(s.nom, ',', s.address, ', ', s.town, ', ', s.zip, ', ', country.label) as adress ";
 		$sql .= "FROM llx_societe as s, llx_c_country as country ";
 		$sql .= "WHERE s.rowid = $id AND s.fk_pays = country.rowid";
 		
 		//print("<pre>".print_r($sql, true)."</pre>");
 		//die();
-		 
+		
 		$result = "";
 		$res = $this->db->query($sql);
 		$rows = $res->num_rows;
@@ -707,9 +856,9 @@ class EDISuiviApi extends DolibarrApi
 					"userCreated" => $row['fk_user_author'],
 					"userValidated" => $row['fk_user_valid'],
 					"createDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_creation'])),
-					"modifyDate" => ($row['tms'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['tms'])) ),
-					"validDate" => ($row['date_valid'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_valid'])) ),
-					"deliveryDate" => ($row['date_livraison'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_livraison'])) ),
+					"modifyDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['tms'])),
+					"validDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_valid'])),
+					"deliveryDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_livraison'])),
 					"deliveryAddress" => $this->getOrderDeliveryAddress($id),
 					"invoiceAddress" => $this->getSocieteAddress($row['fk_soc_id']),
 					"benefitAmout" => "15.0",
