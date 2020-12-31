@@ -188,6 +188,55 @@ class EDISuiviApi extends DolibarrApi
 	/*##########################################################################################################################*/
 	/*########################################  Gestion Api Charts  ##########################################################*/
 	
+	
+	/**
+     * Get numbre of orders per month, this and last year
+     *
+     * Return an objet with chart informations
+     *
+     * @param 	int 	$socId 			ID of entreprise
+     * @return 	array|mixed 			data without useless information
+     *
+     * @url	GET chart/nb-orders-2-years
+     * @throws 	RestException
+     */
+	public function getNbOrdersByMonthOfTwoYears($socId){
+		
+		$months = 12;
+		$date = new DateTime();
+		$currentYear = strftime("%Y", $date->getTimestamp() );
+		
+		$index = 0;
+		$chartData = null;
+		$chartDataLabels = null;
+		
+		for($y=($currentYear-2); $y < $currentYear; $y++){
+			
+			$chartDataLabels[$index] = ($y+1);
+			for($x=0; $x < $months; $x++){
+				$z = (strlen(($x+1)) == 1 ? "0".($x+1) : ($x+1));
+				$sql  = "SELECT COUNT(*) as nb, date_creation ";
+				$sql .= "FROM llx_commande WHERE date_creation LIKE '%".($y+1)."-$z%' ";
+				$sql .= "AND fk_soc=$socId GROUP BY date_creation , rowid";
+				
+				//print("<pre>".print_r($sql, true)."</pre>");
+				
+				$res = $this->db->query($sql);
+				$rows = $res->num_rows;
+				$chartData[$index][$x] = $rows;
+			}
+			$index++;
+		}
+		
+		
+		return array(
+			'success' => array(
+				'title' => $chartDataLabels,
+				'data' => $chartData
+			)
+		);
+	}
+	
 	/**
 	 *	Return Top 5 most ordered products
 	 *
@@ -203,7 +252,7 @@ class EDISuiviApi extends DolibarrApi
 		$res = $this->db->query($sql);
 		if ($res->num_rows > 0) {
 			while($row = $this->db->fetch_array($sql_)){
-				print("<pre>".print_r($row, true)."</pre>");
+				//print("<pre>".print_r($row, true)."</pre>");
 				
 				$result[$index]['label'] = $row['label'];
 				$result[$index]['nb'] = $row['n'];
@@ -220,6 +269,77 @@ class EDISuiviApi extends DolibarrApi
 	}
 	
 	
+	/**
+	 *	Return Top 5 most ordered categories
+	 *
+	 *  @url	GET chart/top-5-most-ordered-categories/
+     *  @throws 	RestException
+	 */
+	 public function getTop5MostOrderedCategories(){
+		$result;
+		$sql  = "SELECT p.ref, counting_best.n from (SELECT fk_product, count(fk_product) as n FROM `llx_commandedet` WHERE fk_product is not NULL GROUP by fk_product ORDER BY n desc LIMIT 5) as counting_best, llx_product as p ";
+		$sql .= "WHERE counting_best.fk_product = p.rowid";
+		
+		$index = 0;
+		$res = $this->db->query($sql);
+		if ($res->num_rows > 0) {
+			while($row = $this->db->fetch_array($sql)){
+				//print("<pre>".print_r($row, true)."</pre>");
+				
+				$ref = str_replace("C","",$row['ref']);	// remove C in str
+				$ref = str_replace("P","",$row['ref']); // remove P in str
+				$sql_ = "SELECT c.label FROM llx_categorie as c, llx_categorie_product as cp, llx_product as p where c.rowid = cp.fk_categorie and cp.fk_product = p.rowid and p.ref = $ref";
+				$res_ = $this->db->query($sql_);
+				while($row_ = $this->db->fetch_array($sql_)){
+					$result[$index]['label'] = $row_['label'];
+				}
+				
+				$result[$index]['nb'] = $row['n'];
+				$index++;
+			}
+		}
+		
+		return array(
+			"success" => array(
+				"data" => $result,
+			)
+		); 
+	 }
+	 
+	 
+	 /**
+	 *	Return Le chiffre d'affaire par mois de deux ans
+	 *
+	 *  @url	GET chart/nb-budjet-last-2-years/
+     *  @throws 	RestException
+	 */
+	 public function getNbBudjetLast2Years(){
+		 $result;
+		 $months = 11; //12 months
+		 $currentYear = explode("-", date('Y-m-d'))[0];
+		 
+		 for($x=($currentYear-2); $x < $currentYear; $x++){
+			for($y=0; $y < $months; $y++){
+				$month = (strlen($y) == 1 ? "0".($y+1):($y+1));
+				$sql  = "SELECT SUM(total_ttc) as total FROM llx_facture WHERE datec LIKE '$x-".$month."%'";
+				
+				
+				while($row = $this->db->fetch_array($sql)){
+					$result[$index]['month'] = $month;
+					$result[$index]['total'] = $row['total'];
+				}
+				$index++;
+			}
+		 }
+		 
+		 return array(
+			"success" => array(
+				"data" => $result,
+			)
+		);
+	 }
+		 
+		 
 	/*##########################################################################################################################*/
 	/*########################################  Gestion Api Commande  ##########################################################*/
 	
@@ -468,17 +588,17 @@ class EDISuiviApi extends DolibarrApi
 			$str_filter .= "";
 		}else {
 			$isFirst = true;
-			$str_filter .= "c.ref = '".$filter['ref']."' AND ";
+			$str_filter .= "c.ref LIKE '%".$filter['ref']."%' AND ";
 		}
 		
 		if($filter['ref_client'] == ""){
 			$str_filter .= "";
 		}else {
 			if($isfirst){
-				$str_filter .= "AND c.ref_client = '".$filter['ref_client']."' ";
+				$str_filter .= "AND c.ref_client LIKE '%".$filter['ref_client']."%' ";
 			}else{
 				$isFirst = true;
-				$str_filter .= "c.ref_client = '".$filter['ref_client']."' AND ";
+				$str_filter .= "c.ref_client LIKE '%".$filter['ref_client']."%' AND ";
 			}
 		}
 		

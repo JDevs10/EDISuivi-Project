@@ -90,7 +90,7 @@ export class SuiviCommandeComponent implements OnInit {
     // }
 
     // check if form is empty and limit is same
-    console.log(value);
+    // console.log(value);
     this.ordersParams.filter = value;
     this.getOrders_v3(this.ordersParams);
   }
@@ -127,9 +127,9 @@ export class SuiviCommandeComponent implements OnInit {
       });
     });
 
-    console.log("res : ", res);
+    // console.log("res : ", res);
 
-    console.log("orders ", res.success);
+    // console.log("orders ", res.success);
     this.total_cmds = res.success.total_cmd + "";
     this.current_page = res.success.current_page;
     this.total_pages = res.success.total_pages;
@@ -158,7 +158,7 @@ export class SuiviCommandeComponent implements OnInit {
     // this.showLoadingUI(true);
 
     const nextPage = (this.current_page + 1);
-    if(nextPage < this.total_pages){
+    if(nextPage <= this.total_pages){
       // console.log("loadPreviousPage => "+nextPage);
       this.ordersParams.page = nextPage;
       

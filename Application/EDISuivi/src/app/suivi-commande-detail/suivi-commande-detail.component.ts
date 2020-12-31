@@ -66,8 +66,9 @@ export class SuiviCommandeDetailComponent implements OnInit {
           // Present error to user
           // console.log('NavigationError: ', event.error);
       }
-  });
-   }
+    });
+  }
+
 
   ngOnInit(): void {
     this.getOrderById();
@@ -96,75 +97,79 @@ export class SuiviCommandeDetailComponent implements OnInit {
   async getOrderById(){
     // this.showLoadingUI(true);
 
-    const res: any = await new Promise(async (resolved) => {
-      await this.commandeService.getOrderById(this.router.url.split("/")[3]).subscribe(async (data) => {
-        await resolved(data);
+    if(this.router.url.split("/")[3] != null){
+      const res: any = await new Promise(async (resolved) => {
+        await this.commandeService.getOrderById(this.router.url.split("/")[3]).subscribe(async (data) => {
+          await resolved(data);
+        });
       });
-    });
-
-    console.log("order by id", res);
-    // this.order = res.success.cmds;
-
-    if(res == null || res.status == "error"){
-      alert("Aucune commande trouvé!");
-      // return in suivi-cmd
-      // this.showLoadingUI(false);
-      // this.router.navigate(['../']);
+  
+      // console.log("order by id", res);
+      // this.order = res.success.cmds;
+  
+      if(res == null || res.status == "error"){
+        alert("Aucune commande trouvé!");
+        // return in suivi-cmd
+        // this.showLoadingUI(false);
+        // this.router.navigate(['../']);
+        this.endFirstLoad = true;
+        return;
+      }
+  
+      const order_lines = [];
+      for(let x=0; x < res.order.lines.length; x++){
+        order_lines.push({rowid: res.order.lines[x].rowid, barecode: (res.order.lines[x].barcode == null || res.order.lines[x].barcode == "" ? "" : res.order.lines[x].barcode), ref: res.order.lines[x].ref, label: res.order.lines[x].libelle, description: res.order.lines[x].description, volume: (res.order.lines[x].volume == null ? "0 " + " m3" : res.order.lines[x].volume + " m3"), weight: (res.order.lines[x].weight == null ? "0 "+ " kg" : res.order.lines[x].weight+" " + " kg"), qty: res.order.lines[x].qty, unitPriceHT: res.order.lines[x].price, montantHT: res.order.lines[x].total_ht, tva: res.order.lines[x].total_tva, unitPriceTTC: res.order.lines[x].total_ttc, warehouse: res.order.lines[x].default_warehouse});
+      }
+  
+      // set delivery adress
+      // check in extrafields_data for custom fields
+      let deliveryAddress;
+      let receptionDate;
+      if(res.order.extrafields_data != null){
+        deliveryAddress = (res.order.extrafields_data.deliveryAddress_custom == null ? "Aucune adresse de livraison trouvée." : res.order.extrafields_data.deliveryAddress_custom);
+        receptionDate = (res.order.extrafields_data.receptionDate_custom == null ? "" : res.order.extrafields_data.receptionDate_custom);
+      }else{
+        deliveryAddress = "Aucune adresse de livraison trouvée.";
+        receptionDate = "";
+      }
+  
+      this.order = {
+        rowid: res.order.rowid,
+        ref: res.order.ref,
+        client1: res.order.client1,
+        client2: res.order.client2,
+        assign: res.order.assign,
+        createDate: res.order.createDate,
+        validDate: res.order.validDate,
+        deliveryDate: res.order.deliveryDate,
+        receptionDate: receptionDate,
+        userCreated: res.order.userCreated,
+        userValidated: res.order.userValidated,
+        deliveryAddress: deliveryAddress,
+        invoiceAddress: (res.order.invoiceAddress == null || res.order.invoiceAddress == "" ? "Aucune adresse de facturation trouvée." : res.order.invoiceAddress),
+        htAmout: res.order.htAmout,
+        tvaAmount: res.order.tvaAmount,
+        ttcAmout: res.order.ttcAmout,
+        comment: (res.order.comment == null || res.order.comment == "" ? "Aucun commentaire." : res.order.comment),
+        anomaly: (res.order.anomaly == null || res.order.anomaly == "" ? "Aucune anomalie détectée." : res.order.anomaly),
+        status: res.order.status,
+        last_main_doc: {
+          modulePart: res.order.last_main_doc.modulePart,
+          files: [
+            // {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.dd}
+          ],
+        },
+        lines: order_lines
+      };
+  
+      this.order_lines_length = this.order.lines.length;
+  
+      // console.log("this.order ", this.order);
       this.endFirstLoad = true;
-      return;
+      // this.showLoadingUI(false);
+
     }
-
-    const order_lines = [];
-    for(let x=0; x < res.order.lines.length; x++){
-      order_lines.push({rowid: res.order.lines[x].rowid, barecode: (res.order.lines[x].barcode == null || res.order.lines[x].barcode == "" ? "" : res.order.lines[x].barcode), ref: res.order.lines[x].ref, label: res.order.lines[x].libelle, volume: (res.order.lines[x].volume == null ? "0 " + " m3" : res.order.lines[x].volume + " m3"), weight: (res.order.lines[x].weight == null ? "0 "+ " kg" : res.order.lines[x].weight+" " + " kg"), qty: res.order.lines[x].qty, unitPriceHT: res.order.lines[x].price, montantHT: res.order.lines[x].total_ht, tva: res.order.lines[x].total_tva, unitPriceTTC: res.order.lines[x].total_ttc, warehouse: res.order.lines[x].default_warehouse});
-    }
-
-    // set delivery adress
-    // check in extrafields_data for custom fields
-    let deliveryAddress;
-    let receptionDate;
-    if(res.order.extrafields_data != null){
-      deliveryAddress = (res.order.extrafields_data.deliveryAddress_custom == null ? "Aucune adresse de livraison trouvée." : res.order.extrafields_data.deliveryAddress_custom);
-      receptionDate = (res.order.extrafields_data.receptionDate_custom == null ? "" : res.order.extrafields_data.receptionDate_custom);
-    }else{
-      deliveryAddress = "Aucune adresse de livraison trouvée.";
-      receptionDate = "";
-    }
-
-    this.order = {
-      rowid: res.order.rowid,
-      ref: res.order.ref,
-      client1: res.order.client1,
-      client2: res.order.client2,
-      assign: res.order.assign,
-      createDate: res.order.createDate,
-      validDate: res.order.validDate,
-      deliveryDate: res.order.deliveryDate,
-      receptionDate: receptionDate,
-      userCreated: res.order.userCreated,
-      userValidated: res.order.userValidated,
-      deliveryAddress: deliveryAddress,
-      invoiceAddress: (res.order.invoiceAddress == null || res.order.invoiceAddress == "" ? "Aucune adresse de facturation trouvée." : res.order.invoiceAddress),
-      htAmout: res.order.htAmout,
-      tvaAmount: res.order.tvaAmount,
-      ttcAmout: res.order.ttcAmout,
-      comment: (res.order.comment == null || res.order.comment == "" ? "Aucun commentaire." : res.order.comment),
-      anomaly: (res.order.anomaly == null || res.order.anomaly == "" ? "Aucune anomalie détectée." : res.order.anomaly),
-      status: res.order.status,
-      last_main_doc: {
-        modulePart: res.order.last_main_doc.modulePart,
-        files: [
-          // {rowid: res.order.last_main_doc.files.rowid, name: res.order.last_main_doc.files.name, file: res.order.last_main_doc.files.file, size: res.order.last_main_doc.files.size, dateTime: res.order.last_main_doc.files.dateTime, downloadLink: res.order.last_main_doc.files.dd}
-        ],
-      },
-      lines: order_lines
-    };
-
-    this.order_lines_length = this.order.lines.length;
-
-    // console.log("this.order ", this.order);
-    this.endFirstLoad = true;
-    // this.showLoadingUI(false);
+    
   }
 
 

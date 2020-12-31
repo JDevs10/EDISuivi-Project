@@ -52,12 +52,20 @@ export class NavbarComponent implements OnInit {
       // console.log('nav data :', data);
       this.userInfo.client_name = data.success.nom_entreprise;
       this.userInfo.user_name = data.success.identifiant_EDISuivi;
-      const dateNoSeconds = data.success.last_connexion.split(':');
-      this.userInfo.last_connexion = dateNoSeconds[0]+":"+dateNoSeconds[1]+":"+dateNoSeconds[2];
-
-      if(data.success.identifiant_EDISuivi == "admin" || data.success.identifiant_EDISuivi == "JL"){
-        this.userInfo.userIsAdmin = "Oui";
+      
+      if(data.success.last_connexion != null){
+        const dateNoSeconds = data.success.last_connexion.split(':');
+        this.userInfo.last_connexion = dateNoSeconds[0]+":"+dateNoSeconds[1]+":"+dateNoSeconds[2];
+  
+        if(data.success.identifiant_EDISuivi == "admin" || data.success.identifiant_EDISuivi == "JL"){
+          this.userInfo.userIsAdmin = "Oui";
+        }
+        
+      }else{
+        this.userInfo.last_connexion = "";
+        this.userInfo.userIsAdmin = "";
       }
+      
     }
   }
 

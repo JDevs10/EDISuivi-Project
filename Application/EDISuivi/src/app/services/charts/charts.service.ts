@@ -14,7 +14,7 @@ export class ChartsService {
   constructor(private http: HttpClient) { }
 
   getNbOrdersByMonthOfTwoYears(socId): Observable<ChartData>{
-    console.log("url : ", this.url+`/edisuiviapi/chart/nb-orders-2-years?socId=${socId}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    // console.log("url : ", this.url+`/edisuiviapi/chart/nb-orders-2-years?socId=${socId}&DOLAPIKEY=${this.DOLAPIKEY}`);
     return this.http.get<ChartData>(this.url+`/edisuiviapi/chart/nb-orders-2-years?socId=${socId}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
   }
 }
