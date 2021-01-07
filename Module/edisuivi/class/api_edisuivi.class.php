@@ -22,7 +22,7 @@ use Luracast\Restler\Format\UploadFormat;
 
 dol_include_once('/edisuivi/class/entreprise.class.php');
 dol_include_once('/edisuivi/class/utilisateur.class.php');
-///require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
  
 
@@ -464,6 +464,87 @@ class EDISuiviApi extends DolibarrApi
 		}
 	}
 	
+	public function getStatusLabel_v2($id, $lang){
+		$RECEPTION_PARTIELLE = 0; 				// 
+		$RECEPTION_COMPLETE = 1; 				// 
+		$COMMANDE_NON_PLANIFIEE = 2; 			// 
+		$COMMANDE_PLANIFIEE = 3; 				// 
+		$COMMANDE_LIVREE_SANS_RESERVES = 4; 	// 
+		$COMMANDE_LIVREE_AVEC_RESERVES = 5; 	//
+		$ANNULEE = 6; 							// annulée
+
+
+		$labelStatus = "";
+		
+		if($id == null || $id == "null" || $id == ""){
+			return "";
+		}
+		
+		switch ($id) {
+			case $RECEPTION_PARTIELLE:
+				if($lang == "FR"){
+					$labelStatus = "RECEPTION PARTIELLE";
+				}
+				if($lang == "EN"){
+					$labelStatus = "PARTIAL RECEPTION";
+				}
+				break;
+			case $RECEPTION_COMPLETE:
+				if($lang == "FR"){
+					$labelStatus = "RECEPTION COMPLETE";
+				}
+				if($lang == "EN"){
+					$labelStatus = "FULL RECEPTION";
+				}
+				break;
+			case $COMMANDE_NON_PLANIFIEE:
+				if($lang == "FR"){
+					$labelStatus = "COMMANDE NON PLANIFIEE";
+				}
+				if($lang == "EN"){
+					$labelStatus = "UNPLANNED ORDER";
+				}
+				break;
+			case $COMMANDE_PLANIFIEE:
+				if($lang == "FR"){
+					$labelStatus = "COMMANDE PLANIFIEE";
+				}
+				if($lang == "EN"){
+					$labelStatus = "SCHEDULED ORDER";
+				}
+				break;
+			case $COMMANDE_LIVREE_SANS_RESERVES:
+				if($lang == "FR"){
+					$labelStatus = "COMMANDE LIVREE SANS RESERVES";
+				}
+				if($lang == "EN"){
+					$labelStatus = "ORDER DELIVERED WITHOUT RESERVATIONS";
+				}
+				break;
+			case $COMMANDE_LIVREE_AVEC_RESERVES:
+				if($lang == "FR"){
+					$labelStatus = "COMMANDE LIVREE AVEC RESERVES";
+				}
+				if($lang == "EN"){
+					$labelStatus = "ORDER DELIVERED WITH RESERVATIONS";
+				}
+				break;
+			case $ANNULEE:
+				if($lang == "FR"){
+					$labelStatus = "ANNULEE";
+				}
+				if($lang == "EN"){
+					$labelStatus = "CANCELED";
+				}
+				break;
+			default:
+				$labelStatus = "";
+				$labelStatusShort = "";
+		}
+		
+		return $labelStatus;
+	}
+	
 	
 	/**
      * Get a list of orders
@@ -528,8 +609,10 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['ref'] = $row['ref'];
 				$result[$index]['date_creation'] = $row['date_creation'];
 				$result[$index]['date_livraison'] = $row['date_livraison'];
-				$result[$index]['zip'] = $row['zip'];
-				$result[$index]['town'] = $row['town'];
+				$result[$index]['userCreated'] = $row['userCreated'];
+				$result[$index]['userCreated'] = $row['userCreated'];
+				//$result[$index]['zip'] = $row['zip'];
+				//$result[$index]['town'] = $row['town'];
 				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
 				$result[$index]['statut'] = $this->getStatusLabel($row['fk_statut'], -99, $status_mode);
 				
@@ -568,7 +651,7 @@ class EDISuiviApi extends DolibarrApi
      * @param 	string	$sortorder	    Sort order
 	 * @param 	int		$limit		    Limit for list
      * @param 	int		$page		    Page number
-	 * @param 	string	$filter		 	Exp:{'test': 1, 'test2': 'Hey', 'test3': 15.66}
+	 * @param 	string	$filter		 	Exp:{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
      * @return 	array|mixed 			data without useless information
      *
      * @url	GET orders/of-user/v3
@@ -578,7 +661,8 @@ class EDISuiviApi extends DolibarrApi
     {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
 		// {"ref":"","ref_client":"JL","town":"","zip":"","creation_date":"","delivery_date":"2020-12-28","total_ht":"","total_tva":"","total_ttc":"","statut":"1","billed":"0","limit":"25"}
 		// {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
-
+		// {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+		
 		$filter = json_decode($filter, true);
 	
 		$isFirst = false;
@@ -599,6 +683,40 @@ class EDISuiviApi extends DolibarrApi
 			}else{
 				$isFirst = true;
 				$str_filter .= "c.ref_client LIKE '%".$filter['ref_client']."%' AND ";
+			}
+		}
+		
+		
+		if($filter['client1'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) LIKE '%".$filter['client1']."%' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "(SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) LIKE '%".$filter['client1']."%' AND ";
+			}
+		}
+		
+		if($filter['userCreated'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) LIKE '%".$filter['userCreated']."%' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "(SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) LIKE '%".$filter['userCreated']."%' AND ";
+			}
+		}
+		
+		if($filter['assigned'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) LIKE '%".$filter['assigned']."%' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "(SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) LIKE '%".$filter['assigned']."%' AND ";
 			}
 		}
 		
@@ -668,6 +786,7 @@ class EDISuiviApi extends DolibarrApi
 			}
 		}
 		
+		/* Version 1
 		if($filter['statut'] == ""){
 			$str_filter .= "";
 		}else {
@@ -676,6 +795,19 @@ class EDISuiviApi extends DolibarrApi
 			}else{
 				$isFirst = true;
 				$str_filter .= "c.fk_statut = ".$filter['statut']." AND ";
+			}
+		}
+		*/
+		
+		// Version 2
+		if($filter['statut'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND (SELECT status FROM llx_commande_extrafields WHERE fk_object = c.rowid) = ".$filter['statut']." ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = c.rowid) = ".$filter['statut']." AND ";
 			}
 		}
 		
@@ -692,14 +824,16 @@ class EDISuiviApi extends DolibarrApi
 		
 		$limit = $filter['limit'];
 		
-		//print("<pre>".print_r($str_filter)."</pre>");
+		//print("<pre>".print_r($str_filter, true)."</pre>");
 		//die();
 		
 		$result;
 		
 		$sql  = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
 		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
-		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label ";
+		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label, ";
+		$sql .= "(SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as client1, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) as assign, ";
+		$sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = c.rowid) as status ";
 		$sql .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
 		$sql .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
 		$sql .= "WHERE c.fk_soc = s.rowid AND c.fk_soc = $socId AND $str_filter c.entity IN (1) "; 
@@ -727,12 +861,15 @@ class EDISuiviApi extends DolibarrApi
 			
 			while($row = $this->db->fetch_array($sql)){
 				//print("<pre>".print_r($row, true)."</pre>"); 
-				
+				//die();
 				
 				// sql_v3
 				$result[$index]['rowid'] = $row['rowid'];
 				$result[$index]['ref'] = $row['ref'];
 				$result[$index]['client_name'] = $row['name'];
+				$result[$index]['client1'] = $row['client1'];
+				$result[$index]['userCreated'] = $row['fk_user_author'];
+				$result[$index]['assign'] = $row['assign'];
 				$result[$index]['ref_client'] = $row['ref_client'];
 				$result[$index]['town'] = $row['town'];
 				$result[$index]['zip'] = $row['zip'];
@@ -741,7 +878,8 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['total_ht'] = round($row['total_ht'], 3);
 				$result[$index]['total_tva'] = round($row['total_tva'], 3);
 				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
-				$result[$index]['statut'] = $this->getStatusLabel($row['fk_statut'], $row['billed'], $status_mode);
+				//$result[$index]['statut'] = $this->getStatusLabel($row['fk_statut'], $row['billed'], $status_mode);
+				$result[$index]['statut_'] = $this->getStatusLabel_v2($row['status'], "FR");
 				$result[$index]['billed'] = ($row['billed'] == 0 ? "Non" : $row['billed'] == 1 ? "Oui" : "NaN");
 				
 				$index++;
@@ -750,7 +888,7 @@ class EDISuiviApi extends DolibarrApi
 		else{
 			return array(
 			"error" => array(
-				"message" => "Aucune commande trouve.",
+				"message" => "Aucune commande trouve.", 
 				)
 			);
 		}
@@ -765,6 +903,21 @@ class EDISuiviApi extends DolibarrApi
 			)
 		);
     }
+	
+	private function getOrderAssignByOrderId($id){
+		$sql_3 = "SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id";
+		
+		$result = "";
+		$res = $this->db->query($sql_3);
+		$rows = $res->num_rows;
+		if($rows > 0) {
+			while($row = $this->db->fetch_array($sql_3)){
+				$result = ($row['lastname'] == null || $row['lastname'] == "" ? "" : $row['lastname']);
+			}
+		}
+		
+		return $result;
+	}
 	
 	private function getTotalPages($sql, $limit){
 		
@@ -947,7 +1100,8 @@ class EDISuiviApi extends DolibarrApi
 		//error_reporting(E_ALL);
 		//ini_set('display_errors', '1');
 		 
-		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, c.fk_statut, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
+		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
+		 $sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = $id) as status, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
 		 $sql .= "FROM llx_commande as c LEFT JOIN llx_c_payment_term as cr ON c.fk_cond_reglement = cr.rowid LEFT JOIN llx_c_paiement as p ON c.fk_mode_reglement = p.id LEFT JOIN llx_c_availability as ca ON c.fk_availability = ca.rowid LEFT JOIN llx_c_input_reason as dr ON c.fk_input_reason = dr.rowid LEFT JOIN llx_c_incoterms as i ON c.fk_incoterms = i.rowid ";
 		 $sql .= "WHERE c.rowid=$id";
 		 
@@ -964,9 +1118,6 @@ class EDISuiviApi extends DolibarrApi
 		if ($total_cmd > 0) {
 			
 			while($row = $this->db->fetch_array($sql)){
-				//print("<pre>".print_r($row, true)."</pre>");
-				//die();
-				
 				$cmd = array(
 					"rowid" => $row['rowid'],
 					"ref" => $row['ref'],
@@ -987,22 +1138,17 @@ class EDISuiviApi extends DolibarrApi
 					"ttcAmout" => round($row['total_ttc'], 3),
 					"comment" => $row['note_public'],
 					"anomaly" => $row['note_private'],
-					"status" => $this->getStatusLabel($row['fk_statut'], $row['billed'], 1),
-					"last_main_doc" => array(
-						"modulePart" => explode("/", $row['last_main_doc'])[0], 
-						"files" => array(
-							"rowid" => 0, 
-							"name" => explode("/", $row['last_main_doc'])[2], 
-							"file" => explode("/", $row['last_main_doc'])[2],
-							"size" => "406 ko", 
-							"dateTime" => "05/11/2020 11:43", 
-							"dd" => "http://82.253.71.109/prod/bdc_v11_04/custom/edisuivi/backend/download.php?modulepart=commande&file=CMD201029-000414%2FCMD201029-000414.pdf&entity=1",
-							"downloadLink" => "http://82.253.71.109/prod/bdc_v11_04/custom/edisuivi/backend/download.php?modulepart=".explode("/", $row['last_main_doc'])[0]."&file=".explode("/", $row['last_main_doc'])[1]."%2F".explode("/", $row['last_main_doc'])[2]."&entity=1&DOLAPIKEY=3-8-13-12-7-8-24-8"
-						) 
-					),
+					//"status" => $this->getStatusLabel($row['fk_statut'], $row['billed'], 1),
+					"status" => $this->getStatusLabel_v2($row['status'], "FR"),
+					"documents" => null,
 					"lines" => array(),
 				);
 			}
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// get files data /////////////////////////////////////////////////////////////////////////////////////////
+			$cmd['documents'] = $this->downloadOrderDocs($id);
+			
 			
 			
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1150,6 +1296,124 @@ class EDISuiviApi extends DolibarrApi
 
 	 
 	 /**
+	 * Get all documents of order id.
+	 *
+	 * Note that, this API is similar to using the wrapper link "documents.php" to download a file (used for
+	 * internal HTML links of documents into application), but with no need to have a session cookie (the token is used instead).
+	 *
+	 * @param 	int		$id				Order id
+	 * @return  array                   List of documents
+	 *
+	 * @throws 400
+	 * @throws 401
+	 * @throws 404
+	 * @throws 200
+	 *
+	 * @url GET /download/order/documents
+	 */
+	public function downloadOrderDocs($id)
+	{
+		global $conf, $langs;
+		
+		$sql = "SELECT rowid, src_object_type, filepath, filename, date_c, date_m FROM llx_ecm_files WHERE src_object_id = $id";
+		$res = $this->db->query($sql); 
+		$result;
+		$index = 0;
+		
+		if ($res->num_rows > 0) {
+			
+			while($row = $this->db->fetch_array($sql)){
+				$original_file_tmp = $row['filepath'] ."/". $row['filename'];
+				$original_file = explode("/", $original_file_tmp)[1] ."/". explode("/", $original_file_tmp)[2];
+					
+				$result[$index]['rowid'] = $row['rowid'];
+				$result[$index]['type'] = $row['src_object_type'];
+				$result[$index]['filepath'] = $row['filepath'];
+				$result[$index]['filename'] = $row['filename'];
+				$result[$index]['original_file'] = $original_file;
+				$result[$index]['date_c'] = $row['date_c'];
+				$result[$index]['date_m'] = $row['date_m'];
+				
+				
+				if (empty($row['src_object_type'])) {
+						throw new RestException(400, 'bad value for parameter modulepart');
+				}
+				if (empty($original_file)) {
+					throw new RestException(400, 'bad value for parameter original_file');
+				}
+
+				//--- Finds and returns the document
+				$entity = $conf->entity;
+
+				$check_access = dol_check_secure_access_document($row['src_object_type'], $original_file, $entity, DolibarrApiAccess::$user, '', 'read');
+				$accessallowed = $check_access['accessallowed'];
+				$sqlprotectagainstexternals = $check_access['sqlprotectagainstexternals'];
+				$original_file = $check_access['original_file'];
+
+				if (preg_match('/\.\./', $original_file) || preg_match('/[<>|]/', $original_file)) {
+					throw new RestException(401);
+				}
+				if (!$accessallowed) {
+					throw new RestException(401);
+				}
+
+				$filename = basename($original_file);
+				$original_file_osencoded = dol_osencode($original_file); // New file name encoded in OS encoding charset
+
+				if (!file_exists($original_file_osencoded))
+				{
+					//print("<pre>".print_r($original_file, true)."</pre>");
+					//die();
+					dol_syslog("Try to download not found file ".$original_file_osencoded, LOG_WARNING);
+					throw new RestException(404, 'File not found');
+				}
+
+				$file_content = file_get_contents($original_file_osencoded);
+				$result[$index]['data'] = array(
+					'filename'=>$filename, 
+					'contentType' => dol_mimetype($filename), 
+					'filectime'=>strftime("%d/%m/%Y %Hh%M", filectime($original_file)), 
+					'filemtime'=>strftime("%d/%m/%Y %Hh%M", filemtime($original_file)), 
+					'filesize'=>$this->formatBytes(filesize($original_file)), 
+					'content'=>base64_encode($file_content), 
+					'encoding'=>'base64'
+				); 
+			
+	
+	
+				$index++;
+			}
+			
+			return array(
+				"files" => $result
+				);
+		}else{
+			
+			return array(
+				"files" => []
+				);
+		}
+		
+		
+	}
+	
+	
+	private function formatBytes($bytes, $precision = 2) { 
+		$units = array('B', 'KB', 'MB', 'GB', 'TB'); 
+
+		$bytes = max($bytes, 0); 
+		$pow = floor(($bytes ? log($bytes) : 0) / log(1024)); 
+		$pow = min($pow, count($units) - 1); 
+
+		// Uncomment one of the following alternatives
+		$bytes /= pow(1024, $pow);
+		// $bytes /= (1 << (10 * $pow)); 
+
+		return round($bytes, $precision) . ' ' . $units[$pow]; 
+	} 
+	
+	
+	/**
 	 * Download a document.
 	 *
 	 * Note that, this API is similar to using the wrapper link "documents.php" to download a file (used for
@@ -1164,9 +1428,9 @@ class EDISuiviApi extends DolibarrApi
 	 * @throws 404
 	 * @throws 200
 	 *
-	 * @url GET /download/order/document
+	 * @url GET /download
 	 */
-	public function downloadOrderDoc($modulepart, $original_file = '')
+	public function download($modulepart, $original_file = '')
 	{
 		global $conf, $langs;
 
@@ -1202,17 +1466,15 @@ class EDISuiviApi extends DolibarrApi
 		}
 
 		$file_content = file_get_contents($original_file_osencoded);
-		//return array('filename'=>$filename, 'content-type' => dol_mimetype($filename), 'filesize'=>filesize($original_file), 'content'=>base64_encode($file_content), 'encoding'=>'base64');
-		
-		
-		fwrite($file, $content);
-		fclose($file);
-		
-		header('content-type: '.dol_mimetype($filename));
-		readfile($file_name);
-		ob_clean();
-		flush();
-		return;
+		return array(
+			'filename'=>$filename, 
+			'contentType' => dol_mimetype($filename), 
+			'filectime'=>strftime("%d/%m/%Y %Hh%M", filectime($original_file)), 
+			'filemtime'=>strftime("%d/%m/%Y %Hh%M", filemtime($original_file)), 
+			'filesize'=>$this->formatBytes(filesize($original_file)), 
+			'content'=>base64_encode($file_content), 
+			'encoding'=>'base64'
+		); 
 	}
 
 

@@ -10,6 +10,7 @@ import { AuthGuard } from './auth.guard';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthenticationService } from './services/authentication/authentication-service.service';
 import { CommandeService } from './services/commande/commande.service';
+import { DownloadService } from './services/download/dowload.service';
 import { DashbordComponent } from './dashbord/dashbord.component';
 import { FooterComponent } from './footer/footer.component';
 import { HeaderComponent } from './header/header.component';
@@ -60,6 +61,7 @@ import { SuiviBonLivraisonComponent } from './suivi-bon-livraison/suivi-bon-livr
   providers: [
     AuthenticationService,
     CommandeService,
+    DownloadService,
     EncrDecrService,
     SupportService,
     AuthGuard

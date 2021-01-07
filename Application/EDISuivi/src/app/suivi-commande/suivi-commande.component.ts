@@ -6,6 +6,7 @@ import { CommandeService } from '../services/commande/commande.service';
 import { SuccessOrder } from '../utils/Models/SuccessOrder';
 import { $ } from 'protractor';
 import { resolve } from 'dns';
+import { NullVisitor } from '@angular/compiler/src/render3/r3_ast';
 
 @Component({
   selector: 'app-suivi-commande',
@@ -39,7 +40,7 @@ export class SuiviCommandeComponent implements OnInit {
     sortorder: "DESC",
     limit: this.commandeService.limitForm.value.limit,
     page: (this.current_page - 1),
-    filter: {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+    filter: {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
   };
 
   orders = [];
@@ -56,7 +57,7 @@ export class SuiviCommandeComponent implements OnInit {
 
   loadStatus(){
     const status = new Status();
-    this.statuts = status.getStatus();
+    this.statuts = status.getStatus_v2();
   }
 
   showLoadingUI(value){
@@ -83,14 +84,6 @@ export class SuiviCommandeComponent implements OnInit {
   */
 
   getOrderFromForm(value) {
-
-    // check if limit not changed
-    // if(this.ordersParams.limit != value.limit) {
-      
-    // }
-
-    // check if form is empty and limit is same
-    // console.log(value);
     this.ordersParams.filter = value;
     this.getOrders_v3(this.ordersParams);
   }
@@ -120,22 +113,23 @@ export class SuiviCommandeComponent implements OnInit {
 
   async getOrders_v3(params){
     // this.showLoadingUI(true);
-
     const res: SuccessOrder = await new Promise(async (resolved) => {
       await this.commandeService.getOrders_v3(params).subscribe(async (data) => {
         await resolved(data);
       });
     });
 
-    // console.log("res : ", res);
+    console.log("res : ", res);
 
     // console.log("orders ", res.success);
-    this.total_cmds = res.success.total_cmd + "";
-    this.current_page = res.success.current_page;
-    this.total_pages = res.success.total_pages;
-    var pageLabel = document.getElementById('page-current-all');
-    pageLabel.innerText = (this.current_page + 1)+"/"+(this.total_pages + 1);
-    this.orders = res.success.cmds;
+    if(res.success != null){
+      this.total_cmds = res.success.total_cmd + "";
+      this.current_page = res.success.current_page;
+      this.total_pages = res.success.total_pages;
+      var pageLabel = document.getElementById('page-current-all');
+      pageLabel.innerText = (this.current_page + 1)+"/"+(this.total_pages + 1);
+      this.orders = res.success.cmds;
+    }
 
     // this.showLoadingUI(false);
   }
