@@ -25,8 +25,10 @@ export class CommandeService {
   filterForm = new FormGroup({
     ref: new FormControl(''),
     ref_client: new FormControl(''),
-    town: new FormControl(''),
-    zip: new FormControl(''),
+
+    client1: new FormControl(''),
+    userCreated: new FormControl(''),
+    assigned: new FormControl(''),
     creation_date: new FormControl(''),
     delivery_date: new FormControl(''),
     total_ht: new FormControl(''),
@@ -43,16 +45,17 @@ export class CommandeService {
   }
 
   getOrders_v3(value): Observable<SuccessOrder>{
-    const data = {
-      test1: 1,
-      test2: 1.541,
-      test3: 1684,
-      test4: "dvbfdbfd",
-      test5: "dfbdb",
-    };
+    // const data = {
+    //   test1: 1,
+    //   test2: 1.541,
+    //   test3: 1684,
+    //   test4: "dvbfdbfd",
+    //   test5: "dfbdb",
+    // };
 
-    console.log("url : ", this.url+`/edisuiviapi/orders/of-user/v3?socId=${value.socId}&obj=${JSON.stringify(data)}&status_mode=${value.status_mode}&sortfield=${value.sortfield}&sortorder=${value.sortorder}&limit=${value.limit}&page=${value.page}&DOLAPIKEY=${this.DOLAPIKEY}`);
-    return this.http.get<SuccessOrder>(this.url+`/edisuiviapi/orders/of-user/v3?socId=${value.socId}&obj=${JSON.stringify(data)}&status_mode=${value.status_mode}&sortfield=${value.sortfield}&sortorder=${value.sortorder}&limit=${value.limit}&page=${value.page}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+    console.log("url : ", this.url+`/edisuiviapi/orders/of-user/v3?socId=${value.socId}&filter=${JSON.stringify(value.filter)}&status_mode=${value.status_mode}&sortfield=${value.sortfield}&sortorder=${value.sortorder}&limit=${value.limit}&page=${value.page}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    return this.http.get<SuccessOrder>(this.url+`/edisuiviapi/orders/of-user/v3?socId=${value.socId}&filter=${JSON.stringify(value.filter)}&status_mode=${value.status_mode}&sortfield=${value.sortfield}&sortorder=${value.sortorder}&limit=${value.limit}&page=${value.page}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+
   }
 
   getOrderById(id): Observable<any>{

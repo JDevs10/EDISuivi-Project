@@ -1,0 +1,5 @@
+Générer le site
+ng build --prod --base-href [URL] --deploy-url [URL]
+
+Ex:
+ng build --prod --base-href http://82.253.71.109/prod/bdc_v11_04/custom/edisuivi/EDISuivi/ --deploy-url http://82.253.71.109/prod/bdc_v11_04/custom/edisuivi/EDISuivi/

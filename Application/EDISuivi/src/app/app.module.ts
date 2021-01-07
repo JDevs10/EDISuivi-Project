@@ -10,6 +10,7 @@ import { AuthGuard } from './auth.guard';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthenticationService } from './services/authentication/authentication-service.service';
 import { CommandeService } from './services/commande/commande.service';
+import { DownloadService } from './services/download/dowload.service';
 import { DashbordComponent } from './dashbord/dashbord.component';
 import { FooterComponent } from './footer/footer.component';
 import { HeaderComponent } from './header/header.component';
@@ -23,6 +24,10 @@ import { SettingsComponent } from './settings/settings.component';
 import { SupportExterneComponent } from './support-externe/support-externe.component';
 import { EncrDecrService } from './services/encryption/encr-decr.service';
 import { SupportService } from './services/support/support.service';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { MyChartComponent } from './my-chart/my-chart.component';
+import { SuiviBonLivraisonComponent } from './suivi-bon-livraison/suivi-bon-livraison.component';
 
 
 @NgModule({
@@ -40,6 +45,10 @@ import { SupportService } from './services/support/support.service';
     SuiviStocksComponent,
     SettingsComponent,
     SupportExterneComponent,
+    SidebarComponent,
+    NavbarComponent,
+    MyChartComponent,
+    SuiviBonLivraisonComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,6 +61,7 @@ import { SupportService } from './services/support/support.service';
   providers: [
     AuthenticationService,
     CommandeService,
+    DownloadService,
     EncrDecrService,
     SupportService,
     AuthGuard

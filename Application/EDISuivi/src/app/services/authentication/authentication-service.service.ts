@@ -17,13 +17,22 @@ export class AuthenticationService {
   private url = environment.api.service;
   private DOLAPIKEY = "3-8-13-12-7-8-24-8";
 
+  private HEADERS = {
+    'Referrer-Policy': 'no-referrer',
+    'Content-Type': 'application/x-www-form-urlencoded', 
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, PUT, OPTIONS',
+    'Access-Control-Allow-Headers': 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range',
+    'Access-Control-Expose-Headers': 'Content-Length,Content-Range'
+  };
+
   constructor(private http: HttpClient, 
     private router: Router,
     private encrDecrService: EncrDecrService) { }
 
   loginForm = new FormGroup({
-    user: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+    user: new FormControl('JL', Validators.required),
+    password: new FormControl('anexys1,', Validators.required)
   });
 
   loggedIn(){
@@ -47,16 +56,18 @@ export class AuthenticationService {
 
   doLogin(value): Observable<any[]>{
     //console.log("url : ", this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`);
-    return this.http.post<any[]>(this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+    return this.http.post<any[]>(this.url+`/edisuiviapi/login?login=${value.user}&password=${value.password}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: this.HEADERS});
   }
 
   createUserLocalToken(res){
     const d = new Date();
     const validTime = d.getTime() + 1800000;
     const data = {
-      success: res.success, 
+      success: res.success,
       valideData: validTime
     }
+
+    // console.log(data);
 
     localStorage.setItem("userSuccess", this.encrDecrService.encrypt(JSON.stringify(data)));
   }

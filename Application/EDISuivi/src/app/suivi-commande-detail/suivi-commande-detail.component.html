@@ -1,5 +1,6 @@
-<div style="min-height: 80vh;">
-
+<div style="min-height: 80vh; margin-bottom: 100px;">
+    <div id="panel-header-empty" class="panel-header">
+    </div>
     <!-- <div id="main-content-loading" style="width: '100%';">
         <div style="text-align: center;">
             <p style="margin: 50px; font-size: 30px; font-weight: bold;">Chargement de la commande....</p>
@@ -58,8 +59,8 @@
 
                 <div class="cmd-action">
                     <button class="cmd-action-btn" (click)="back();">Retour</button>
-                    <button class="cmd-action-btn-block" (click)="download_bl();">Voir BL</button>
-                    <button class="cmd-action-btn-block" (click)="download_invoice();">Voir Facture</button>
+                    <!-- <button class="cmd-action-btn-block" (click)="download_bl();">Voir BL</button>
+                    <button class="cmd-action-btn-block" (click)="download_invoice();">Voir Facture</button> -->
                 </div>
             </div>
 
@@ -128,12 +129,13 @@
                     <p style="font-weight: bold; text-decoration: underline;">Produits ({{order_lines_length}})</p>
                 </div>
 
-                <table class="cmd-line-table" style="max-height: 500px;">
+                <table class="cmd-line-table" style="max-height: 300px;">
                     <thead class="cmd-line-table-thead">
                         <tr>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Code-barre</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Référence</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Désignation</th>
+                            <th class="table-cell" style="padding: 5px; margin-right: 5px;">Description</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Volume</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Poids</th>
                             <th class="table-cell" style="padding: 5px; margin-right: 5px;">Quantitée</th>
@@ -150,6 +152,7 @@
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.barecode}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.ref}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.label}}</td>
+                            <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.description}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.volume}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.weight}}</td>
                             <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.qty}}</td>
@@ -174,18 +177,21 @@
                         <table class="cmd-files-table">
                             <thead class="cmd-files-table-thead">
                                 <tr>
+                                    <th class="table-cell" style="padding: 5px; margin-right: 5px;"> <!--download--></th>
                                     <th class="table-cell" style="padding: 5px; margin-right: 5px;">Nom</th>
                                     <th class="table-cell" style="padding: 5px; margin-right: 5px;">Taille</th>
                                     <th class="table-cell" style="padding: 5px; margin-right: 5px;">Date création</th>
+                                    <th class="table-cell" style="padding: 5px; margin-right: 5px;">Date modification</th>
                                 </tr>
                             </thead>
 
-                            <tbody *ngFor="let line of order.last_main_doc.files">
-                                <tr class="cmd-files-table-tbody-tr">
-                                    <!-- <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="{{line.downloadLink}}" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td> -->
-                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;"><a href="{{line.downloadLink}}" class="cmd-files-table-tbody-tr-file">{{line.name}}</a></td>
-                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.size}}</td>
-                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.dateTime}}</td>
+                            <tbody>
+                                <tr class="cmd-files-table-tbody-tr" *ngFor="let line of order.documents.files">
+                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;"><button style="background: transparent; border: none;" (click)="download_bl(line);"><i class="fas fa-download fa-md"></i></button></td>
+                                    <td class="table-cell cmd-files-table-tbody-tr-file" style="padding: 5px; margin-right: 5px; text-decoration: underline;" ><a href="https://ctm.bdcloud.fr/commande/CO2012-0005/CO2012-0005.pdf" target="_blank">{{line.data.filename}}</a></td>
+                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filesize}}</td>
+                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filectime}}</td>
+                                    <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filemtime}}</td>
                                 </tr>
                             </tbody>
                         </table>

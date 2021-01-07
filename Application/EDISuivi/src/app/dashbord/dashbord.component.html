@@ -1,40 +1,267 @@
-<div style="min-height: 80vh;">
-    <div class="container_">
-        <div  style="padding: 20px;" class="my-row">
-            <a style="margin: 0 auto" routerLink="../suivi-commandes">
-                <!-- <div class="container_ diamond-shape">
-                    <div class="item-count">Suivi Commandes</div>
-                </div> -->
-                <img class="rounded-circle" src="assets/button0.png" alt="EDISuivi Icon" width="250" height="250">
-            </a>
-            <a style="margin: 0 auto" routerLink="../suivi-factures">
-                <!-- <div class="container_ diamond-shape">
-                    <div class="item-count">Suivi Factures</div>
-                </div> -->
-                <img class="rounded-circle" src="assets/button3.png" alt="EDISuivi Icon" width="250" height="250">
-            </a>
-            <a style="margin: 0 auto" routerLink="../suivi-stocks">
-                <!-- <div class="container_ diamond-shape">
-                    <div class="item-count">Suivi<br>Stocks</div>
-                </div> -->
-                <img class="rounded-circle" src="assets/button4.png" alt="EDISuivi Icon" width="250" height="250">
-            </a>
-        </div>
+<div class="panel-header panel-header-lg">
+  <span id="my-global-chart-label">Nombre de commande par mois</span><br>
+  <app-my-chart id="my-global-chart"></app-my-chart>
+</div> 
 
-        <div style="padding: 20px;" class="my-row">
-            <a style="margin: 0 auto" routerLink="../support-interne">
-                <!-- <div class="container_ diamond-shape">
-                    <div class="item-count">Support</div>
-                </div> -->
-                <img class="rounded-circle" src="assets/button1.png" alt="EDISuivi Icon" width="250" height="250">
-            </a>
-            <a style="margin: 0 auto" routerLink="../settings">
-                <!-- <div class="container_ diamond-shape">
-                    <div class="item-count">Paramètres</div>
-                </div> -->
-                <img class="rounded-circle" src="assets/button2.png" alt="EDISuivi Icon" width="250" height="250">
-            </a>
+<div class="main-content">
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Top 5</h5>
+          <h4 class="card-title">Des produits les plus commandés</h4>
+          <!-- <div ngbDropdown>
+            <button type="button" class="btn btn-round btn-default dropdown-toggle btn-simple btn-icon no-caret" ngbDropdownToggle>
+              <i class="now-ui-icons loader_gear"></i>
+            </button> 
+            <div ngbDropdownMenu class="dropdown-menu-right">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+              <a class="dropdown-item text-danger" href="#">Remove Data</a>
+            </div>
+          </div> -->
         </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas baseChart id="lineChartExample"></canvas>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="stats">
+            <i class="now-ui-icons arrows-1_refresh-69"></i> Synchronisation
+          </div>
+        </div>
+      </div>
     </div>
-    
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Top 5</h5>
+          <h4 class="card-title">Des catégories les plus commandées</h4>
+          <!-- <div ngbDropdown>
+            <button type="button" class="btn btn-round btn-default dropdown-toggle btn-simple btn-icon no-caret" ngbDropdownToggle>
+              <i class="now-ui-icons loader_gear"></i>
+            </button>
+            <div ngbDropdownMenu class="dropdown-menu-right">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <a class="dropdown-item" href="#">Something else here</a>
+              <a class="dropdown-item text-danger" href="#">Remove Data</a>
+            </div>
+          </div> -->
+        </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="lineChartExampleWithNumbersAndGrid"></canvas>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="stats">
+            <i class="now-ui-icons arrows-1_refresh-69"></i> Synchronisation
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Durée de deux ans</h5>
+          <h4 class="card-title">Chiffre d'affaires par mois</h4>
+        </div>
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas baseChart id="barChartSimpleGradientsNumbers"></canvas>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="stats">
+            <i class="now-ui-icons ui-2_time-alarm"></i> Synchronisation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- <div class="col-md-6">
+      <div class="card  card-tasks">
+        <div class="card-header ">
+          <h5 class="card-category">Backend development</h5>
+          <h4 class="card-title">Tasks</h4>
+        </div>
+        <div class="card-body ">
+          <div class="table-full-width table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <span class="form-check-sign"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td class="text-left">Sign contract for "What are conference organizers afraid of?"</td>
+                  <td class="td-actions text-right">
+                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
+                      <i class="now-ui-icons ui-2_settings-90"></i>
+                    </button>
+                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
+                      <i class="now-ui-icons ui-1_simple-remove"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox">
+                        <span class="form-check-sign"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td class="text-left">Lines From Great Russian Literature? Or E-mails From My Boss?</td>
+                  <td class="td-actions text-right">
+                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
+                      <i class="now-ui-icons ui-2_settings-90"></i>
+                    </button>
+                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
+                      <i class="now-ui-icons ui-1_simple-remove"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <span class="form-check-sign"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td class="text-left">Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
+                  </td>
+                  <td class="td-actions text-right">
+                    <button type="button" rel="tooltip" title="" class="btn btn-info btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Edit Task">
+                      <i class="now-ui-icons ui-2_settings-90"></i>
+                    </button>
+                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-round btn-icon btn-icon-mini btn-neutral" data-original-title="Remove">
+                      <i class="now-ui-icons ui-1_simple-remove"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer ">
+          <hr>
+          <div class="stats">
+            <i class="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <!-- <div class="col-md-12" style="margin-bottom: 50px;">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-category">All Persons List</h5>
+          <h4 class="card-title"> Employees Stats</h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead class=" text-primary">
+                <th>
+                  Name
+                </th>
+                <th>
+                  Country
+                </th>
+                <th>
+                  City
+                </th>
+                <th class="text-right">
+                  Salary
+                </th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    Dakota Rice
+                  </td>
+                  <td>
+                    Niger
+                  </td>
+                  <td>
+                    Oud-Turnhout
+                  </td>
+                  <td class="text-right">
+                    $36,738
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Minerva Hooper
+                  </td>
+                  <td>
+                    Curaçao
+                  </td>
+                  <td>
+                    Sinaai-Waas
+                  </td>
+                  <td class="text-right">
+                    $23,789
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Sage Rodriguez
+                  </td>
+                  <td>
+                    Netherlands
+                  </td>
+                  <td>
+                    Baileux
+                  </td>
+                  <td class="text-right">
+                    $56,142
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Doris Greene
+                  </td>
+                  <td>
+                    Malawi
+                  </td>
+                  <td>
+                    Feldkirchen in Kärnten
+                  </td>
+                  <td class="text-right">
+                    $63,542
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Mason Porter
+                  </td>
+                  <td>
+                    Chile
+                  </td>
+                  <td>
+                    Gloucester
+                  </td>
+                  <td class="text-right">
+                    $78,615
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
 </div>
