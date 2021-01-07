@@ -1006,27 +1006,6 @@ class EDISuiviApi extends DolibarrApi
 		return $result;
 	}
 	
-	private function getSocieteAddress($id){
-		
-		$sql = "SELECT CONCAT(s.nom, ', ', s.address, ', ', s.town, ', ', s.zip, ', ', country.label) as adress ";
-		$sql .= "FROM llx_societe as s, llx_c_country as country ";
-		$sql .= "WHERE s.rowid = $id AND s.fk_pays = country.rowid";
-		
-		//print("<pre>".print_r($sql, true)."</pre>");
-		//die();
-		 
-		$result = "";
-		$res = $this->db->query($sql);
-		$rows = $res->num_rows;
-		if($rows > 0) {
-			while($row = $this->db->fetch_array($sql)){
-				$result = $row['adress'];
-				break;
-			}
-		}
-		return $result;
-	}
-	
 	private function getOrderInvoiceAddress($id){ 
 		
 		$sql = "SELECT CONCAT(spp.civility, ' ', spp.lastname, ' ', spp.firstname, ', ', spp.address, ', ', spp.zip, ', ', country.label) as adress ";
@@ -1120,7 +1099,7 @@ class EDISuiviApi extends DolibarrApi
 		
 		//error_reporting(E_ALL);
 		//ini_set('display_errors', '1');
-
+		 
 		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
 		 $sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = $id) as status, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
 		 $sql .= "FROM llx_commande as c LEFT JOIN llx_c_payment_term as cr ON c.fk_cond_reglement = cr.rowid LEFT JOIN llx_c_paiement as p ON c.fk_mode_reglement = p.id LEFT JOIN llx_c_availability as ca ON c.fk_availability = ca.rowid LEFT JOIN llx_c_input_reason as dr ON c.fk_input_reason = dr.rowid LEFT JOIN llx_c_incoterms as i ON c.fk_incoterms = i.rowid ";
@@ -1168,28 +1147,7 @@ class EDISuiviApi extends DolibarrApi
 			
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// get files data /////////////////////////////////////////////////////////////////////////////////////////
-			$cmd['documents'] = $this->downloadOrderDocs($id);
-			
-			
-			
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// get extrafields data /////////////////////////////////////////////////////////////////////////////////////////
-			$sql_extra = "SELECT * FROM llx_commande_extrafields WHERE fk_object = $id";
-			$res = $this->db->query($sql_extra);
-			$total_extra = $res->num_rows;
-			$extrafields_data = null; 
-			
-			if($total_extra > 0){
-				$row = $this->db->fetch_array($sql_extra);
-				
-				//print("<pre>".print_r($sql_extra, true)."</pre>");
-				//die();
-				
-				$extrafields_data = array(
-					"receptionDate_custom" => strftime("%d-%m-%Y %Hh%M", strtotime($row['dateentry'])),				// date de reception
-					"deliveryAddress_custom" => $row['adresseship']		// adress de reception de la commande
-				);
-			}
+			$cmd['documents'] = $this->downloadOrderDocs($cmd['ref']);
 			
 			
 			
@@ -1343,7 +1301,7 @@ class EDISuiviApi extends DolibarrApi
 	 * Note that, this API is similar to using the wrapper link "documents.php" to download a file (used for
 	 * internal HTML links of documents into application), but with no need to have a session cookie (the token is used instead).
 	 *
-	 * @param 	int		$id				Order id
+	 * @param 	string		$ref_cmd	Order ref
 	 * @return  array                   List of documents
 	 *
 	 * @throws 400
@@ -1353,11 +1311,11 @@ class EDISuiviApi extends DolibarrApi
 	 *
 	 * @url GET /download/order/documents
 	 */
-	public function downloadOrderDocs($id)
+	public function downloadOrderDocs($ref_cmd)
 	{
 		global $conf, $langs;
 		
-		$sql = "SELECT rowid, src_object_type, filepath, filename, date_c, date_m FROM llx_ecm_files WHERE src_object_id = $id";
+		$sql = "SELECT rowid, src_object_type, filepath, filename, date_c, date_m FROM llx_ecm_files WHERE filepath LIKE '%/$ref_cmd'";
 		$res = $this->db->query($sql); 
 		$result;
 		$index = 0;
@@ -1367,9 +1325,10 @@ class EDISuiviApi extends DolibarrApi
 			while($row = $this->db->fetch_array($sql)){
 				$original_file_tmp = $row['filepath'] ."/". $row['filename'];
 				$original_file = explode("/", $original_file_tmp)[1] ."/". explode("/", $original_file_tmp)[2];
+				$src_object_type = ($row['src_object_type'] == null ? "commande" : $row['src_object_type']);
 					
 				$result[$index]['rowid'] = $row['rowid'];
-				$result[$index]['type'] = $row['src_object_type'];
+				$result[$index]['type'] = $src_object_type;
 				$result[$index]['filepath'] = $row['filepath'];
 				$result[$index]['filename'] = $row['filename'];
 				$result[$index]['original_file'] = $original_file;
@@ -1377,7 +1336,7 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['date_m'] = $row['date_m'];
 				
 				
-				if (empty($row['src_object_type'])) {
+				if (empty($src_object_type)) {
 						throw new RestException(400, 'bad value for parameter modulepart');
 				}
 				if (empty($original_file)) {
@@ -1387,7 +1346,7 @@ class EDISuiviApi extends DolibarrApi
 				//--- Finds and returns the document
 				$entity = $conf->entity;
 
-				$check_access = dol_check_secure_access_document($row['src_object_type'], $original_file, $entity, DolibarrApiAccess::$user, '', 'read');
+				$check_access = dol_check_secure_access_document($src_object_type, $original_file, $entity, DolibarrApiAccess::$user, '', 'read');
 				$accessallowed = $check_access['accessallowed'];
 				$sqlprotectagainstexternals = $check_access['sqlprotectagainstexternals'];
 				$original_file = $check_access['original_file'];
@@ -1404,7 +1363,7 @@ class EDISuiviApi extends DolibarrApi
 
 				if (!file_exists($original_file_osencoded))
 				{
-					//print("<pre>".print_r($original_file, true)."</pre>");
+					//print("<pre>".print_r($result, true)."</pre>");
 					//die();
 					dol_syslog("Try to download not found file ".$original_file_osencoded, LOG_WARNING);
 					throw new RestException(404, 'File not found');
@@ -1413,15 +1372,14 @@ class EDISuiviApi extends DolibarrApi
 				$file_content = file_get_contents($original_file_osencoded);
 				$result[$index]['data'] = array(
 					'filename'=>$filename, 
+					'downloadLink'=> explode("/", $check_access['original_file'])[4] ."/". explode("/", $check_access['original_file'])[5] ."/". explode("/", $check_access['original_file'])[6] ."/". explode("/", $check_access['original_file'])[7] ."/". explode("/", $check_access['original_file'])[8],
 					'contentType' => dol_mimetype($filename), 
 					'filectime'=>strftime("%d/%m/%Y %Hh%M", filectime($original_file)), 
 					'filemtime'=>strftime("%d/%m/%Y %Hh%M", filemtime($original_file)), 
 					'filesize'=>$this->formatBytes(filesize($original_file)), 
 					'content'=>base64_encode($file_content), 
 					'encoding'=>'base64'
-				); 
-			
-	
+				);
 	
 				$index++;
 			}

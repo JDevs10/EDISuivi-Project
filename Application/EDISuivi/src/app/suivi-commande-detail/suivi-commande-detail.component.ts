@@ -218,6 +218,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
       // this.showLoadingUI(false);
 
     }
+    
   }
 
 

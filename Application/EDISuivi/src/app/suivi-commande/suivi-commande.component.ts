@@ -78,7 +78,7 @@ export class SuiviCommandeComponent implements OnInit {
   /*
   getOrderByLimit() {
     // console.log("limitForm ", this.commandeService.limitForm.value);
-	this.ordersParams.limit = this.commandeService.filterForm.value.limit;
+    this.ordersParams.limit = this.commandeService.filterForm.value.limit;
     this.getOrders(this.ordersParams);
   }
   */
@@ -88,6 +88,28 @@ export class SuiviCommandeComponent implements OnInit {
     this.getOrders_v3(this.ordersParams);
   }
 
+  /*
+  async getOrders(params){
+    // this.showLoadingUI(true);
+
+    const res: SuccessOrder = await new Promise(async (resolved) => {
+      await this.commandeService.getOrders(params).subscribe(async (data) => {
+        await resolved(data);
+      });
+    });
+
+    // console.log("res : ", res);
+
+    // console.log("orders ", res.success);
+    this.total_cmds = res.success.total_cmd + "";
+    this.current_page = res.success.current_page;
+    this.total_pages = res.success.total_pages;
+    var pageLabel = document.getElementById('page-current-all');
+    pageLabel.innerText = (this.current_page + 1)+"/"+this.total_pages;
+    this.orders = res.success.cmds;
+
+    // this.showLoadingUI(false);
+  }*/
 
   async getOrders_v3(params){
     // this.showLoadingUI(true);
