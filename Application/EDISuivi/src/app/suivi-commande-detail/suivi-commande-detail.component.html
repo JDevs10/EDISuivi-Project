@@ -188,7 +188,7 @@
                             <tbody>
                                 <tr class="cmd-files-table-tbody-tr" *ngFor="let line of order.documents.files">
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;"><button style="background: transparent; border: none;" (click)="download_bl(line);"><i class="fas fa-download fa-md"></i></button></td>
-                                    <td class="table-cell cmd-files-table-tbody-tr-file" style="padding: 5px; margin-right: 5px; text-decoration: underline;" ><a href="https://ctm.bdcloud.fr/commande/CO2012-0005/CO2012-0005.pdf" target="_blank">{{line.data.filename}}</a></td>
+                                    <td class="table-cell cmd-files-table-tbody-tr-file" style="padding: 5px; margin-right: 5px; text-decoration: underline;" ><a href="https://{{line.data.downloadLink}}" target="_blank">{{line.data.filename}}</a></td>
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filesize}}</td>
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filectime}}</td>
                                     <td class="table-cell" style="padding: 5px; margin-right: 5px;">{{line.data.filemtime}}</td>
