@@ -832,7 +832,7 @@ class EDISuiviApi extends DolibarrApi
 		$sql  = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
 		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
 		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label, ";
-		$sql .= "(SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as client1, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) as assign, ";
+		$sql .= "(SELECT namecompagny FROM llx_commande_extrafields WHERE fk_object = c.rowid) as namecompagny, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) as assign, ";
 		$sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = c.rowid) as status ";
 		$sql .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
 		$sql .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
@@ -867,7 +867,7 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['rowid'] = $row['rowid'];
 				$result[$index]['ref'] = $row['ref'];
 				$result[$index]['client_name'] = $row['name'];
-				$result[$index]['client1'] = $row['client1'];
+				$result[$index]['client1'] = $row['namecompagny'];
 				$result[$index]['userCreated'] = $row['fk_user_author'];
 				$result[$index]['assign'] = $row['assign'];
 				$result[$index]['ref_client'] = $row['ref_client'];
@@ -1100,7 +1100,7 @@ class EDISuiviApi extends DolibarrApi
 		//error_reporting(E_ALL);
 		//ini_set('display_errors', '1');
 		 
-		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
+		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT namecompagny FROM llx_commande_extrafields WHERE fk_object = $id) as namecompagny, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
 		 $sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = $id) as status, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
 		 $sql .= "FROM llx_commande as c LEFT JOIN llx_c_payment_term as cr ON c.fk_cond_reglement = cr.rowid LEFT JOIN llx_c_paiement as p ON c.fk_mode_reglement = p.id LEFT JOIN llx_c_availability as ca ON c.fk_availability = ca.rowid LEFT JOIN llx_c_input_reason as dr ON c.fk_input_reason = dr.rowid LEFT JOIN llx_c_incoterms as i ON c.fk_incoterms = i.rowid ";
 		 $sql .= "WHERE c.rowid=$id";
@@ -1121,7 +1121,7 @@ class EDISuiviApi extends DolibarrApi
 				$cmd = array(
 					"rowid" => $row['rowid'],
 					"ref" => $row['ref'],
-					"client1" => $row['fk_soc'],
+					"client1" => $row['namecompagny'],
 					"client2" => $row['ref_client'],
 					"assign" => ($row['fk_socpeople'] == null || $row['fk_socpeople'] == "" ? "" : $row['fk_socpeople']),
 					"userCreated" => $row['fk_user_author'],
