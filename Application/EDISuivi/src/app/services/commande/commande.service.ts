@@ -28,7 +28,7 @@ export class CommandeService {
     client1: new FormControl(''),
     userCreated: new FormControl(''),
     assigned: new FormControl(''),
-    creation_date: new FormControl(''),
+    dateCommande: new FormControl(''),
     delivery_date: new FormControl(''),
     total_ht: new FormControl(''),
     total_tva: new FormControl(''),

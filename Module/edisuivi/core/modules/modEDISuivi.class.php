@@ -89,7 +89,7 @@ class modEDISuivi extends DolibarrModules
             // Set this to 1 if module has its own barcode directory (core/modules/barcode)
             'barcode' => 0,
             // Set this to 1 if module has its own models directory (core/modules/xxx)
-            'models' => 0,
+            'models' => 1,
             // Set this to 1 if module has its own theme directory (theme)
             'theme' => 0,
             // Set this to relative path of css file if module has its own css file
@@ -157,7 +157,8 @@ class modEDISuivi extends DolibarrModules
         // $this->tabs[] = array('data'=>'objecttype:+tabname1:Title1:mylangfile@edisuivi:$user->rights->edisuivi->read:/edisuivi/mynewtab1.php?id=__ID__');  					// To add a new tab identified by code tabname1
         // $this->tabs[] = array('data'=>'objecttype:+tabname2:SUBSTITUTION_Title2:mylangfile@edisuivi:$user->rights->othermodule->read:/edisuivi/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2. Label will be result of calling all substitution functions on 'Title2' key.
         // $this->tabs[] = array('data'=>'objecttype:-tabname:NU:conditiontoremove');                                                     										// To remove an existing tab identified by code tabname
-        //
+        $this->tabs[] = array('data'=>'order:+Commentaire:Commentaire:mylangfile@edisuivi:$user->rights->edisuivi->commentaire->read:/edisuivi/commentaire_detail.php?orderId=__ID__');
+		//
         // Where objecttype can be
         // 'categories_x'	  to add a tab in category view (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
         // 'contact'          to add a tab in contact view
@@ -208,11 +209,11 @@ class modEDISuivi extends DolibarrModules
         // Boxes/Widgets
         // Add here list of php file(s) stored in edisuivi/core/boxes that contains a class to show a widget.
         $this->boxes = array(
-            //  0 => array(
-            //      'file' => 'edisuiviwidget1.php@edisuivi',
-            //      'note' => 'Widget provided by EDISuivi',
-            //      'enabledbydefaulton' => 'Home',
-            //  ),
+              0 => array(
+                  'file' => 'edisuiviwidget1.php@edisuivi',
+                  'note' => 'Widget provided by EDISuivi',
+                  //'enabledbydefaulton' => 'Home',
+              ),
             //  ...
         );
 
@@ -292,6 +293,23 @@ class modEDISuivi extends DolibarrModules
         $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
         $this->rights[$r][1] = 'Delete Utilisateur of EDISuivi'; // Permission label
         $this->rights[$r][4] = 'utilisateur'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $r++;
+        
+        // Commentaire
+        $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
+        $this->rights[$r][1] = 'Read Comments of EDISuivi'; // Permission label
+        $this->rights[$r][4] = 'commentaire'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
+        $this->rights[$r][1] = 'Create/Update Comments of EDISuivi'; // Permission label
+        $this->rights[$r][4] = 'commentaire'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero + $r; // Permission id (must not be already used)
+        $this->rights[$r][1] = 'Delete Comments of EDISuivi'; // Permission label
+        $this->rights[$r][4] = 'commentaire'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
         $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->edisuivi->level1->level2)
         $r++;
         // END MODULEBUILDER PERMISSIONS
@@ -408,6 +426,51 @@ class modEDISuivi extends DolibarrModules
             'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
         );
         // END MODULEBUILDER LEFTMENU UTILISATEUR
+        
+        // BEGIN MODULEBUILDER LEFTMENU COMMENTAIRE
+        $this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=edisuivi',      // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'=>'left',                          // This is a Top menu entry
+            'titre'=>'Commentaire',
+            'mainmenu'=>'edisuivi',
+            'leftmenu'=>'edisuivi_commentaire',
+            // 'url'=>'/edisuivi/commentaire_page.php?action=create',
+            'langs'=>'edisuivi@edisuivi',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'position'=>9000+$r,
+            'enabled'=>'$conf->edisuivi->enabled',  // Define condition to show or hide menu entry. Use '$conf->edisuivi->enabled' if entry must be visible if module is enabled.
+            'perms'=>'$user->rights->edisuivi->commentaire->read',			                // Use 'perms'=>'$user->rights->edisuivi->level1->level2' if you want your menu with a permission rules
+            'target'=>'',
+            'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+        );
+        $this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=edisuivi,fk_leftmenu=edisuivi_commentaire',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'=>'left',			                // This is a Left menu entry
+            'titre'=>'Nouveau Commentaire',
+            'mainmenu'=>'edisuivi',
+            'leftmenu'=>'edisuivi_commentaire_new',
+            'url'=>'/edisuivi/commentaire_card.php?action=create',
+            'langs'=>'edisuivi@edisuivi',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'position'=>9000+$r,
+            'enabled'=>'$conf->edisuivi->enabled',  // Define condition to show or hide menu entry. Use '$conf->edisuivi->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'perms'=>'$user->rights->edisuivi->commentaire->write',			                // Use 'perms'=>'$user->rights->edisuivi->level1->level2' if you want your menu with a permission rules
+            'target'=>'',
+            'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+        );
+        $this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=edisuivi,fk_leftmenu=edisuivi_commentaire',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'=>'left',			                // This is a Left menu entry
+            'titre'=>'Liste',
+            'mainmenu'=>'edisuivi',
+            'leftmenu'=>'edisuivi_commentaire_list',
+            'url'=>'/edisuivi/commentaire_list.php',
+            'langs'=>'edisuivi@edisuivi',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'position'=>9000+$r,
+            'enabled'=>'$conf->edisuivi->enabled',  // Define condition to show or hide menu entry. Use '$conf->edisuivi->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'perms'=>'$user->rights->edisuivi->commentaire->read',			                // Use 'perms'=>'$user->rights->edisuivi->level1->level2' if you want your menu with a permission rules
+            'target'=>'',
+            'user'=>2,				                // 0=Menu for internal users, 1=external users, 2=both
+        );
+        // END MODULEBUILDER LEFTMENU COMMENTAIRE
 
         
 
@@ -511,21 +574,65 @@ class modEDISuivi extends DolibarrModules
             }
         }
 
-		
+		*/
         $sql = array(
             "DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = '".$this->db->escape($this->const[0][2])."' AND type = 'edisuivi' AND entity = ".$conf->entity,
             "INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('".$this->db->escape($this->const[0][2])."','edisuivi',".$conf->entity.")"
         );
-        */
+        
 		
-		$query1 = "INSERT INTO `llx_user` (`rowid`, `entity`, `ref_ext`, `ref_int`, `employee`, `fk_establishment`, `datec`, `tms`, `fk_user_creat`, `fk_user_modif`, `login`, `pass`, `pass_crypted`, `pass_temp`, `api_key`, `gender`, `civility`, `lastname`, `firstname`, `address`, `zip`, `town`, `fk_state`, `fk_country`, `job`, `skype`, `office_phone`, `office_fax`, `user_mobile`, `personal_mobile`, `email`, `personal_email`, `socialnetworks`, `signature`, `admin`, `module_comm`, `module_compta`, `fk_soc`, `fk_socpeople`, `fk_member`, `fk_user`, `fk_user_expense_validator`, `fk_user_holiday_validator`, `note_public`, `note`, `model_pdf`, `datelastlogin`, `datepreviouslogin`, `egroupware_id`, `ldap_sid`, `openid`, `statut`, `photo`, `lang`, `color`, `barcode`, `fk_barcode_type`, `accountancy_code`, `nb_holiday`, `thm`, `tjm`, `salary`, `salaryextra`, `dateemployment`, `dateemploymentend`, `weeklyhours`, `import_key`, `birth`, `pass_encoding`, `default_range`, `default_c_exp_tax_cat`, `twitter`, `facebook`, `instagram`, `snapchat`, `googleplus`, `youtube`, `whatsapp`, `linkedin`, `fk_warehouse`, `iplastlogin`, `ippreviouslogin`) 
-					VALUES (NULL, '1', NULL, NULL, '1', '0', NULL, CURRENT_TIMESTAMP, NULL, NULL, 'edisuivi', 'anexys1,', NULL, NULL, '3-8-13-12-7-8-24-8', NULL, NULL, 'edisuivi', NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, NULL, NULL, '0', NULL, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);";
+		// Create module
+		$this->_init($sql, $options);
 		
+		// Create User edisuivi
+        $EdiSuivi_login = "edisuivi";
+        $EdiSuivi_mdp = "anexys1";
+        $EdiSuivi_api_key = "3-8-13-12-7-8-24-8";
+        $query1 = "INSERT INTO llx_user (`rowid`, `entity`, `ref_ext`, `ref_int`, `employee`, `fk_establishment`, `datec`, `tms`, `fk_user_creat`, `fk_user_modif`, `login`, `pass`, `pass_crypted`, `pass_temp`, `api_key`, `gender`, `civility`, `lastname`, `firstname`, `address`, `zip`, `town`, `fk_state`, `fk_country`, `job`, `skype`, `office_phone`, `office_fax`, `user_mobile`, `personal_mobile`, `email`, `personal_email`, `socialnetworks`, `signature`, `admin`, `module_comm`, `module_compta`, `fk_soc`, `fk_socpeople`, `fk_member`, `fk_user`, `fk_user_expense_validator`, `fk_user_holiday_validator`, `note_public`, `note`, `model_pdf`, `datelastlogin`, `datepreviouslogin`, `egroupware_id`, `ldap_sid`, `openid`, `statut`, `photo`, `lang`, `color`, `barcode`, `fk_barcode_type`, `accountancy_code`, `nb_holiday`, `thm`, `tjm`, `salary`, `salaryextra`, `dateemployment`, `dateemploymentend`, `weeklyhours`, `import_key`, `birth`, `pass_encoding`, `default_range`, `default_c_exp_tax_cat`, `twitter`, `facebook`, `instagram`, `snapchat`, `googleplus`, `youtube`, `whatsapp`, `linkedin`, `fk_warehouse`, `iplastlogin`, `ippreviouslogin`) 
+					VALUES (NULL, '1', NULL, NULL, '1', '0', NULL, CURRENT_TIMESTAMP, NULL, NULL, '$EdiSuivi_login', '$iApps_mdp,', NULL, NULL, '$iApps_api_key', NULL, NULL, '$EdiSuivi_login', NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, NULL, NULL, '0', NULL, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);";
+		
+		$res = $this->db->query($query1);
+		// Get User edisuivi id
+		$userId = -1;
+		$query2 = "SELECT rowid FROM llx_user where login = '$EdiSuivi_login' AND lastname = '$EdiSuivi_login'";
+		
+		$res = $this->db->query($query2);
+		while($row = $this->db->fetch_array($query2)){
+			$userId = $row['rowid'];
+		}
+		
+		// get dolibar permissions
+		if($userId > 0){
+			$rightsTable = [];
+			$query3 = "SELECT * FROM llx_rights_def WHERE module = 'edisuivi'";
+			$res = $this->db->query($query3);
+			
+			if ($res->num_rows > 0) {
+				$i=0;
+				while($row = $this->db->fetch_array($query3)){
+					$rightsTable[$i] = array(
+						"fk_user" => $userId,
+						"fk_id" => $row['id']
+					);
+					$i++;
+				}
+				
+				for($z=0; $z<($i+1); $z++){
+					$query4 = "INSERT INTO llx_user_rights (rowid, entity, fk_user, fk_id) VALUES (null, 1, ".$rightsTable[$z]['fk_user'].", ".$rightsTable[$z]['fk_id'].")";
+					$res = $this->db->query($query4);
+				}
+			}
+		}
+		
+		
+		
+		/*
 		$sql = array(
             $query1
         );
+		*/
 
-        return $this->_init($sql, $options);
+        return;
     }
 
     /**
@@ -540,10 +647,24 @@ class modEDISuivi extends DolibarrModules
     {
         $sql = array();
 		
-		$query1 = "DELETE FROM llx_user where login = 'edisuivi' AND lastname = 'edisuivi'";
-		$sql = array(
-            $query1
-        );
+		// Get User edisuivi id
+		$EdiSuivi_login = "edisuivi";
+		$userId = -1;
+		$query1 = "SELECT rowid FROM llx_user where login = '$EdiSuivi_login' AND lastname = '$EdiSuivi_login'";
+		
+		$res = $this->db->query($query1);
+		if ($res->num_rows > 0) {
+			while($row = $this->db->fetch_array($query1)){
+				$userId = $row['rowid'];
+			}
+			
+			$query2 = "DELETE FROM llx_user_rights where fk_user = ".$userId;
+			$query3 = "DELETE FROM llx_user where login = '$EdiSuivi_login' AND lastname = '$EdiSuivi_login'";
+			$sql = array(
+				$query2,
+				$query3
+			);
+		}
 		
         return $this->_remove($sql, $options);
     }

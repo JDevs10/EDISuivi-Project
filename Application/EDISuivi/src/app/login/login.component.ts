@@ -12,7 +12,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if(this.authenticationService.loggedIn()){
-      window.location.href="#/home/dashbord";
+      // window.location.href="#/home/dashbord";
+      window.location.href="#/home";
     }
     
   }
@@ -34,13 +35,13 @@ export class LoginComponent implements OnInit {
         await resolved(data);
       });
     });
-    // console.log("tryLogin() => res : ", res);
+    console.log("tryLogin() => res : ", res);
 
     // const res: any = {
     //   "success": {
     //     "ref_user_EDISuivi": "USER-0000003",
     //     "identifiant_EDISuivi": "JL",
-    //     "last_connexion": "2020-12-22 11:30:02",
+    //     "last_connexion": "2021-01-24 00:50:00",
     //     "user_type_EDISuivi": "1",
     //     "nom_entreprise_EDISuivi": "@JL",
     //     "nb_commandes": null,
@@ -61,7 +62,8 @@ export class LoginComponent implements OnInit {
 
     this.authenticationService.createUserLocalToken(res);
 
-    window.location.href="#/home/dashbord";
+    // window.location.href="#/home/dashbord";
+    window.location.href="#/home";
   }
 
 }
