@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, Event, NavigationStart, NavigationEnd, NavigationError } from '@angular/router';
 import { CommandeService } from '../services/commande/commande.service';
 import { DownloadService } from '../services/download/dowload.service';
@@ -7,7 +7,8 @@ import { DownloadFile } from '../utils/Models/DownloadFile';
 @Component({
   selector: 'app-suivi-commande-detail',
   templateUrl: './suivi-commande-detail.component.html',
-  styleUrls: ['./suivi-commande-detail.component.css']
+  styleUrls: ['./suivi-commande-detail.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SuiviCommandeDetailComponent implements OnInit {
 
@@ -19,9 +20,11 @@ export class SuiviCommandeDetailComponent implements OnInit {
   order = {
     rowid: 0,
     ref: "Chargement...",
+    fk_soc:"",
     client1: "Chargement...",
     client2: "Chargement...",
     assign: "Chargement...",
+    dateCommande: "Chargement...",
     createDate: "Chargement...",
     validDate: "Chargement...",
     deliveryDate: "Chargement...",
@@ -64,7 +67,7 @@ export class SuiviCommandeDetailComponent implements OnInit {
     ]
   };
 
-  constructor(private commandeService: CommandeService, private downloadService: DownloadService, private router: Router) {
+  constructor(public commandeService: CommandeService, private downloadService: DownloadService, private router: Router) {
     router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
           // Show loading indicator
@@ -142,35 +145,6 @@ export class SuiviCommandeDetailComponent implements OnInit {
 
       const order_documents = res.order.documents.files;
 
-      /*
-      for(let x=0; x < res.order.documents.files.length; x++){
-        console.log("order_documents :", res.order.documents);
-        console.log("res.order.documents.files[x].type :", res.order.documents.files[x].type);
-
-        const obj = {
-          rowid: res.order.documents.files[x].rowid, 
-          type: res.documents.files[x].type, 
-          // filepath: res.documents.files[x].filepath, 
-          // filename: res.documents.files[x].filename, 
-          // original_file: res.order.lines[x].original_file, 
-          // date_c: res.documents.files[x].date_c, 
-          // date_m: res.documents.files[x].date_m, 
-          // data: {
-          //   filename: res.documents.files[x].data.filename,
-          //   contentType: res.documents.files[x].data.contentType,
-          //   filectime: res.documents.files[x].data.filectime,
-          //   filemtime: res.documents.files[x].data.filemtime,
-          //   filesize: res.documents.files[x].data.filesize,
-          //   content: res.documents.files[x].data.content,
-          //   encoding: res.documents.files[x].data.encoding
-          // }
-          
-        }
-        console.log("order_documents__ :", obj);
-        order_documents.push(obj);
-      }
-      */
-  
       // set delivery adress
       // check in extrafields_data for custom fields
       let deliveryAddress;
@@ -188,9 +162,11 @@ export class SuiviCommandeDetailComponent implements OnInit {
       this.order = {
         rowid: res.order.rowid,
         ref: res.order.ref,
+        fk_soc: res.order.fk_soc,
         client1: res.order.client1,
         client2: res.order.client2,
         assign: res.order.assign,
+        dateCommande: res.order.dateCommande,
         createDate: res.order.createDate,
         validDate: res.order.validDate,
         deliveryDate: res.order.deliveryDate,
@@ -214,6 +190,10 @@ export class SuiviCommandeDetailComponent implements OnInit {
       this.order_lines_length = this.order.lines.length;
   
       console.log("this.order ", this.order);
+
+      //get and load order comments
+      this.loadCommentsToHtml(this.router.url.split("/")[3]);
+
       this.endFirstLoad = true;
       // this.showLoadingUI(false);
 
@@ -221,6 +201,114 @@ export class SuiviCommandeDetailComponent implements OnInit {
     
   }
 
+  async addCommentOfOrder(value){
+    value.origin_id = this.order.rowid;
+    value.fk_soc = this.order.fk_soc;
+    value.user = "null"; // always null because this var is to use on edisuivi module
+    console.log(value);
+
+    const res: any = await new Promise(async (resolved) => {
+      await this.commandeService.addOrderComment(value).subscribe(async (data) => {
+        await resolved(data);
+      });
+    });
+
+    if(res == null || res.status == "error"){
+      this.endFirstLoad = true;
+      return;
+    }
+
+    value.comment = "";
+    const commentText = document.getElementById("comment-text-filed");
+    commentText
+
+    this.loadCommentsToHtml(value.origin_id);
+  }
+
+  setCommentListContainerView(){
+    const allTheComments = document.getElementById("allTheComments");
+    allTheComments.style.maxHeight = "300px";
+		allTheComments.style.overflowY = "scroll";
+		allTheComments.scrollTop = allTheComments.scrollHeight;
+
+  }
+
+  reSyncComments(){
+    this.loadCommentsToHtml(this.router.url.split("/")[3]);
+  }
+
+  async loadCommentsToHtml(orderId){
+    const res: any = await new Promise(async (resolved) => {
+      await this.commandeService.getOrderComments(orderId).subscribe(async (data) => {
+        await resolved(data);
+      });
+    });
+
+    if(res == null || res.status == "error"){
+      let htmlComments = "";
+      htmlComments +='<div id="comments-container">';
+      htmlComments +='<p>Aucun commentaire trouvé...</p>';
+      htmlComments +='</div>';
+      document.getElementById("allTheComments").innerHTML = htmlComments;
+
+      this.endFirstLoad = true;
+      return;
+    }
+
+    const comments = res.commentaires;
+    let htmlComments = "";
+    htmlComments +='<div id="comments-container">';
+    htmlComments +='<p>Aucun commentaire trouvé...</p>';
+    htmlComments +='</div>';
+
+    if(comments.length > 0){
+      var tmpSaveDate = "";
+      htmlComments = "";
+
+      comments.forEach(element => {
+
+        if(element.date_creation_date != tmpSaveDate){
+          htmlComments +='<div class="my-row">';
+          htmlComments +='<hr class="hr"><span> '+element.date_creation_date+' </span><hr class="hr">';
+          htmlComments +='</div>';
+          tmpSaveDate = element.date_creation_date;
+        }
+
+        if(element.fk_user != null){
+          htmlComments +='<div class="my-comment">';
+          htmlComments +='<div class="my-row">';
+          htmlComments +='<div><img src="assets/user_anonymous.png" alt="user image" width="50" height="50"></div>';
+          htmlComments +='<div>';
+          htmlComments +='<div>';
+          htmlComments +='<span class="commenter-name">'+element.fk_user+' </span><span class="commenter-time">'+element.date_creation_time+'</span>';
+          htmlComments +='</div>';
+          htmlComments +='<div class="commenter-msg">';
+          htmlComments +='<p>'+element.text+'</p>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+        } else if(element.fk_soc != null){
+          htmlComments +='<div class="not-my-comment">';
+          htmlComments +='<div class="my-row">';
+          htmlComments +='<div><img src="assets/user_anonymous.png" alt="user image" width="50" height="50"></div>';
+          htmlComments +='<div>';
+          htmlComments +='<div>';
+          htmlComments +='<span class="commenter-name">'+element.fk_soc+' </span><span class="commenter-time">'+element.date_creation_time+'</span>';
+          htmlComments +='</div>';
+          htmlComments +='<div class="commenter-msg">';
+          htmlComments +='<p>'+element.text+'</p>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+          htmlComments +='</div>';
+        }
+      });
+    }
+    
+    document.getElementById("allTheComments").innerHTML = htmlComments;
+    this.setCommentListContainerView();
+  }
 
   async download_bl(val){
     const downloadedFileData: DownloadFile = await new Promise(async (resolved) => {

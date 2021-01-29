@@ -22,6 +22,7 @@ use Luracast\Restler\Format\UploadFormat;
 
 dol_include_once('/edisuivi/class/entreprise.class.php');
 dol_include_once('/edisuivi/class/utilisateur.class.php');
+dol_include_once('/edisuivi/class/commentaire.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
  
@@ -45,6 +46,7 @@ class EDISuiviApi extends DolibarrApi
      */
     public $entreprise;
 	public $utilisateur;
+	public $commentaire;
 
     /**
      * Constructor
@@ -58,6 +60,7 @@ class EDISuiviApi extends DolibarrApi
         $this->db = $db;
         $this->entreprise = new Entreprise($this->db);
 		$this->utilisateur = new Utilisateur($this->db);
+		$this->commentaire = new Commentaire($this->db);
     }
 	
 	
@@ -651,17 +654,17 @@ class EDISuiviApi extends DolibarrApi
      * @param 	string	$sortorder	    Sort order
 	 * @param 	int		$limit		    Limit for list
      * @param 	int		$page		    Page number
-	 * @param 	string	$filter		 	Exp:{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+	 * @param 	string	$filter		 	Exp:{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","dateCommande":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
      * @return 	array|mixed 			data without useless information
      *
      * @url	GET orders/of-user/v3
      * @throws 	RestException
      */
-    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = '{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}')
+    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = '{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","dateCommande":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}')
     {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
 		// {"ref":"","ref_client":"JL","town":"","zip":"","creation_date":"","delivery_date":"2020-12-28","total_ht":"","total_tva":"","total_ttc":"","statut":"1","billed":"0","limit":"25"}
 		// {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
-		// {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+		// {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"", "dateCommande":"", "delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
 		
 		$filter = json_decode($filter, true);
 	
@@ -739,6 +742,17 @@ class EDISuiviApi extends DolibarrApi
 			}else{
 				$isFirst = true;
 				$str_filter .= "c.date_creation LIKE '".$filter['creation_date']." %' AND ";
+			}
+		}
+		
+		if($filter['dateCommande'] == ""){
+			$str_filter .= "";
+		}else {
+			if($isfirst){
+				$str_filter .= "AND c.date_commande LIKE '".$filter['dateCommande']." %' ";
+			}else{
+				$isFirst = true;
+				$str_filter .= "c.date_commande LIKE '".$filter['dateCommande']." %' AND ";
 			}
 		}
 		
@@ -830,9 +844,9 @@ class EDISuiviApi extends DolibarrApi
 		$result;
 		
 		$sql  = "SELECT s.rowid as socid, s.nom as name, s.email, s.town, s.zip, s.fk_pays, s.client, s.code_client, typent.code as typent_code, state.code_departement as state_code, state.nom as state_name, c.rowid, c.ref, ";
-		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, ";
+		$sql .= "c.total_ht, c.tva as total_tva, c.total_ttc, c.ref_client, c.date_valid, c.date_commande, c.note_private, c.date_livraison as date_delivery, c.fk_statut, c.facture as billed, c.date_creation as date_creation, c.date_commande, ";
 		$sql .= "c.tms as date_update, c.date_cloture as date_cloture, p.rowid as project_id, p.ref as project_ref, p.title as project_label, ";
-		$sql .= "(SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as client1, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) as assign, ";
+		$sql .= "(SELECT namecompagny FROM llx_commande_extrafields WHERE fk_object = c.rowid) as namecompagny, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = c.rowid ORDER BY ele_c__.rowid DESC LIMIT 1) as assign, ";
 		$sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = c.rowid) as status ";
 		$sql .= "FROM llx_societe as s LEFT JOIN llx_c_country as country on (country.rowid = s.fk_pays) LEFT JOIN llx_c_typent as typent on (typent.id = s.fk_typent) LEFT JOIN llx_c_departements as state on (state.rowid = s.fk_departement), ";
 		$sql .= "llx_commande as c LEFT JOIN llx_projet as p ON p.rowid = c.fk_projet ";
@@ -867,14 +881,18 @@ class EDISuiviApi extends DolibarrApi
 				$result[$index]['rowid'] = $row['rowid'];
 				$result[$index]['ref'] = $row['ref'];
 				$result[$index]['client_name'] = $row['name'];
-				$result[$index]['client1'] = $row['client1'];
+				$result[$index]['client1'] = $row['namecompagny'];
 				$result[$index]['userCreated'] = $row['fk_user_author'];
 				$result[$index]['assign'] = $row['assign'];
 				$result[$index]['ref_client'] = $row['ref_client'];
 				$result[$index]['town'] = $row['town'];
 				$result[$index]['zip'] = $row['zip'];
+				/*
 				$result[$index]['date_creation'] = ($row['date_creation'] == "" ? : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_creation'])) );
 				$result[$index]['date_livraison'] = ($row['date_delivery'] == "" ? "" : strftime("%d-%m-%Y %Hh%M", strtotime($row['date_delivery'])) );
+				*/
+				$result[$index]['dateCommande'] = ($row['date_commande'] == "" ? : strftime("%d-%m-%Y", strtotime($row['date_commande'])) );
+				$result[$index]['date_livraison'] = ($row['date_delivery'] == "" ? "" : strftime("%d-%m-%Y", strtotime($row['date_delivery'])) );
 				$result[$index]['total_ht'] = round($row['total_ht'], 3);
 				$result[$index]['total_tva'] = round($row['total_tva'], 3);
 				$result[$index]['total_ttc'] = round($row['total_ttc'], 3);
@@ -1100,7 +1118,7 @@ class EDISuiviApi extends DolibarrApi
 		//error_reporting(E_ALL);
 		//ini_set('display_errors', '1');
 		 
-		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.ref, c.fk_soc as fk_soc_id, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = c.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
+		 $sql = "SELECT c.rowid, c.entity, c.date_creation, c.date_commande, c.ref, c.fk_soc as fk_soc_id, (SELECT namecompagny FROM llx_commande_extrafields WHERE fk_object = $id) as namecompagny, (SELECT u.lastname FROM llx_user as u, llx_element_contact as ele_c__ WHERE u.rowid = ele_c__.fk_socpeople AND ele_c__.element_id = $id ORDER BY ele_c__.rowid DESC LIMIT 1) as fk_socpeople, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_author) as fk_user_author, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = c.fk_user_valid) as fk_user_valid, ";
 		 $sql .= "(SELECT status FROM llx_commande_extrafields WHERE fk_object = $id) as status, c.amount_ht, c.total_ht, c.total_ttc, c.tva as total_tva, c.localtax1 as total_localtax1, c.localtax2 as total_localtax2, c.fk_cond_reglement, c.fk_mode_reglement, c.fk_availability, c.fk_input_reason, c.fk_account, c.date_commande, c.date_valid, c.tms, c.date_livraison, c.fk_shipping_method, c.fk_warehouse, c.fk_projet as fk_project, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed, c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.last_main_doc, c.fk_delivery_address, c.extraparams, c.fk_incoterms, c.location_incoterms, c.fk_multicurrency, c.multicurrency_code, c.multicurrency_tx, c.multicurrency_total_ht, c.multicurrency_total_tva, c.multicurrency_total_ttc, c.module_source, c.pos_source, i.libelle as label_incoterms, p.code as mode_reglement_code, p.libelle as mode_reglement_libelle, cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc, ca.code as availability_code, ca.label as availability_label, dr.code as demand_reason_code ";
 		 $sql .= "FROM llx_commande as c LEFT JOIN llx_c_payment_term as cr ON c.fk_cond_reglement = cr.rowid LEFT JOIN llx_c_paiement as p ON c.fk_mode_reglement = p.id LEFT JOIN llx_c_availability as ca ON c.fk_availability = ca.rowid LEFT JOIN llx_c_input_reason as dr ON c.fk_input_reason = dr.rowid LEFT JOIN llx_c_incoterms as i ON c.fk_incoterms = i.rowid ";
 		 $sql .= "WHERE c.rowid=$id";
@@ -1121,15 +1139,23 @@ class EDISuiviApi extends DolibarrApi
 				$cmd = array(
 					"rowid" => $row['rowid'],
 					"ref" => $row['ref'],
-					"client1" => $row['fk_soc'],
+					"fk_soc" => $row['fk_soc_id'],
+					"client1" => $row['namecompagny'],
 					"client2" => $row['ref_client'],
 					"assign" => ($row['fk_socpeople'] == null || $row['fk_socpeople'] == "" ? "" : $row['fk_socpeople']),
 					"userCreated" => $row['fk_user_author'],
 					"userValidated" => $row['fk_user_valid'],
+					/*
 					"createDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_creation'])),
 					"modifyDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['tms'])),
 					"validDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_valid'])),
 					"deliveryDate" => strftime("%d-%m-%Y %Hh%M", strtotime($row['date_livraison'])),
+					*/
+					"createDate" => strftime("%d-%m-%Y", strtotime($row['date_creation'])),
+					"dateCommande" => strftime("%d-%m-%Y", strtotime($row['date_commande'])),
+					"modifyDate" => strftime("%d-%m-%Y", strtotime($row['tms'])),
+					"validDate" => strftime("%d-%m-%Y", strtotime($row['date_valid'])),
+					"deliveryDate" => strftime("%d-%m-%Y", strtotime($row['date_livraison'])),
 					"deliveryAddress" => $this->getOrderDeliveryAddress($id),
 					"invoiceAddress" => $this->getSocieteAddress($row['fk_soc_id']),
 					"benefitAmout" => "15.0",
@@ -1165,7 +1191,7 @@ class EDISuiviApi extends DolibarrApi
 				//die();
 				
 				$extrafields_data = array(
-					"receptionDate_custom" => strftime("%d-%m-%Y %Hh%M", strtotime($row['dateentry'])),				// date de reception
+					"receptionDate_custom" => ($row['dateentry'] == null ? "00-00-0000" : strftime("%d-%m-%Y", strtotime($row['dateentry'])) ),				// date de reception
 					"deliveryAddress_custom" => $row['adresseship']		// adress de reception de la commande
 				);
 			}
@@ -1292,8 +1318,202 @@ class EDISuiviApi extends DolibarrApi
 		);
 	 }
 	 
+	 
+	/*###################################################################################################################################*/
+	/*#############################################  Gestion Api ORDER COMMENTS  ########################################################*/
+	 
+	 
+	 /**
+     * Get order comments
+     *
+     * Return an array of order comments information
+     *
+     * @param 	int 	$orderId 			ID of order
+     * @return 	array|mixed 			data without useless information
+     *
+     * @url	GET comments/order/id/
+     * @throws 	RestException
+     */
+	public function getOrderCommentsById($orderId){
+		if (! DolibarrApiAccess::$user->rights->edisuivi->commentaire->read) {
+            throw new RestException(401);
+        }
+		
+		$ALL_COMMENTS = null;
+        $sql = "SELECT cmt.rowid, cmt.origin_id, cmt.date_creation, cmt.text, cmt.date_modification, cmt.edited, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = cmt.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = cmt.fk_user) as fk_user ";
+		$sql .= "FROM llx_edisuivi_commentaire as cmt ";
+		$sql .= "WHERE cmt.origin_id = $orderId"; 
+		$res = $this->db->query($sql);
+
+		
+		if($res->num_rows > 0){
+			$index=0;
+			while($row = $this->db->fetch_array($sql)){
+				//print("<pre>".print_r($row,true)."</pre>");
+				
+				$ALL_COMMENTS[$index]['rowid'] = $row['rowid'];
+				$ALL_COMMENTS[$index]['origin_id'] = $row['origin_id'];
+				$ALL_COMMENTS[$index]['date_creation'] = $row['date_creation'];
+				$ALL_COMMENTS[$index]['date_creation_date'] = $this->date_in_french_format("%A %d %B", $row['date_creation']); //strftime("%A, %B %d", strtotime($row['date_creation']));
+				$ALL_COMMENTS[$index]['date_creation_time'] = strftime("%Hh%M", strtotime($row['date_creation']));
+				$ALL_COMMENTS[$index]['text'] = $row['text'];
+				$ALL_COMMENTS[$index]['date_modification'] = $row['date_modification'];
+				$ALL_COMMENTS[$index]['edited'] = $row['edited'];
+				$ALL_COMMENTS[$index]['fk_soc'] = $row['fk_soc'];
+				$ALL_COMMENTS[$index]['fk_user'] = $row['fk_user'];
+				$index++;
+			}
+			
+			return array(
+				"status" => "success",
+				"message" => "Commentaires de la commande ".$orderId." trouve.",
+				"commentaires" => $ALL_COMMENTS
+			);
+			
+		}else{
+            return array(
+				"status" => "error",
+				"message" => "Aucune commentaire trouve.",
+				"commentaires" => 'null'
+			);
+        }
+	}
+	
+	// To set french date format  
+	private function date_in_french_format($params, $date){
+
+        if($date==NULL){ 
+			return "";
+		}
+        setlocale(LC_ALL, 'fr_FR');
+        return strftime( "$params" , strtotime($date));
+		
+		// return this Mercredi 16 septembre 2020
+    }
 
 
+    /**
+     * Create comment order object
+     *
+	 * @param   string  $origin_id		Order id
+	 * @param   string  $message		Message
+	 * @param   string  $fk_soc			Company id
+	 * @param   string  $user			User id
+     * @return 	array|mixed 			status request
+     *
+	 * @url	GET comment/order
+	 * @url	POST comment/order
+     */
+    public function postComment($origin_id, $message, $fk_soc, $user)
+    {
+        if(! DolibarrApiAccess::$user->rights->edisuivi->commentaire->write) {
+            throw new RestException(401);
+        }
+		
+		if(empty($message)){
+			return array(
+				"status" => "error",
+				"message" => "Commentaire vide",
+				"commentaires" => ""
+			);
+		}
+        
+		$sql = "INSERT llx_edisuivi_commentaire (rowid, origin_id, date_creation, text, date_modification, edited, fk_soc, fk_user) ";
+		$sql .= "VALUES (null, ".$origin_id.", CURRENT_TIMESTAMP, '".str_replace("'", "''", $message)."', null, null, ".$fk_soc.", ".$user.")";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				"message" => "Commentaire cree.",
+				"commentaires" => ""
+			);
+		}else{
+			return array(
+				"status" => "error",
+				"message" => "Commentaire pas cree.",
+				"commentaires" => ""
+			);
+		}
+    }
+
+    /**
+     * Update order comment
+     *
+     * @param int   $id             Id of comment to update
+     * @param array $request_data   Datas => Exp:{"origin_id":"","date_creation":"","message":"","fk_soc":"","user":""}
+     * @return int
+     *
+     * @url	PUT comment/{id}
+     */
+    public function putComment($id, $request_data = '{"origin_id":"","date_creation":"","message":"","fk_soc":"","user":""}')
+    {
+        if(! DolibarrApiAccess::$user->rights->edisuivi->commentaire->write) {
+            throw new RestException(401);
+        }
+		/*
+        $sql = "INSERT llx_edisuivi_commentaire (rowid, origin_id, date_creation, text, date_modification, edited, fk_soc, fk_user) ";
+		$sql .= "VALUES (null, ".$request_data['origin_id'].", CURRENT_TIMESTAMP, '".str_replace("'", "''", $request_data['message'])."', null, null, ".$request_data['fk_soc'].", ".$request_data['user'].") ";
+		$sql .= "WHERE rowid = $id";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				'code' => 200,
+				'message' => 'Commentaire mit a jour.'
+			);
+		}else{
+			return array(
+				"status" => "error",
+				'code' => 404,
+				'message' => 'Commentaire pas a jour.'
+			);
+		}
+		*/
+		return array(
+			"status" => "error",
+			'code' => 404,
+			'message' => 'Api non disponible, veuillez continuer le developpement'
+		);
+    }
+
+    /**
+     * Delete comment
+     *
+     * @param   int     $id   Commentaire ID
+     * @return  array
+     *
+     * @url	DELETE comment/{id}
+     */
+    public function deleteComment($id)
+    {
+        if (! DolibarrApiAccess::$user->rights->edisuivi->commentaire->delete) {
+            throw new RestException(401);
+        }
+        
+		$sql = "DELETE FROM llx_edisuivi_commentaire WHERE rowid = $id";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				'code' => 200,
+				'message' => 'Commentaire deleted'
+			);
+		}else{
+			return array(
+				"status" => "error",
+				'code' => 404,
+				'message' => 'Commentaire deleted'
+			);
+		}
+    }
+
+
+	/*#########################################################################################################################################*/
+	/*###############################################  Gestion Api DOCUMENTS DOWNLOAD  ########################################################*/
+	
 	 
 	 /**
 	 * Get all documents of order id.

@@ -19,7 +19,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent},
   { path: 'home', component: HomeComponent, pathMatch : 'prefix', canActivate: [AuthGuard],
     children: [
-      { path: '', redirectTo: 'dashbord', pathMatch: 'full' },
+      { path: '', redirectTo: 'suivi-commandes', pathMatch: 'full' },
       { path: 'dashbord', component: DashbordComponent, canActivate: [AuthGuard] },
       { path: 'suivi-commandes', component: SuiviCommandeComponent, canActivate: [AuthGuard]},
       { path: 'suivi-commande-detail/:id', pathMatch: 'full', component: SuiviCommandeDetailComponent, canActivate: [AuthGuard] },

@@ -28,7 +28,7 @@ export class CommandeService {
     client1: new FormControl(''),
     userCreated: new FormControl(''),
     assigned: new FormControl(''),
-    creation_date: new FormControl(''),
+    dateCommande: new FormControl(''),
     delivery_date: new FormControl(''),
     total_ht: new FormControl(''),
     total_tva: new FormControl(''),
@@ -36,6 +36,13 @@ export class CommandeService {
     statut: new FormControl(''),
     billed: new FormControl(''),
     limit: new FormControl('25')
+  });
+
+  commentForm = new FormGroup({
+    origin_id: new FormControl(''),
+    fk_soc: new FormControl(''),
+    user: new FormControl(''),
+    comment: new FormControl('')
   });
 
   getOrders(value): Observable<SuccessOrder>{
@@ -59,7 +66,14 @@ export class CommandeService {
   getOrderById(id): Observable<any>{
     // console.log("url : ", `${this.url}/edisuiviapi/order/id?id=${id}&DOLAPIKEY=${this.DOLAPIKEY}`);
     return this.http.get<any>(`${this.url}/edisuiviapi/order/id?id=${id}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
-
   }
 
+  addOrderComment(value): Observable<any[]>{
+    return this.http.post<any[]>(this.url+`/edisuiviapi/comment/order?origin_id=${value.origin_id}&message=${value.comment}&fk_soc=${value.fk_soc}&user=${value.user}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+  }
+
+  getOrderComments(id): Observable<any>{
+    // console.log("url : ", `${this.url}/edisuiviapi/order/id?id=${id}&DOLAPIKEY=${this.DOLAPIKEY}`);
+    return this.http.get<any>(`${this.url}/edisuiviapi/comments/order/id?orderId=${id}&DOLAPIKEY=${this.DOLAPIKEY}`, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+  }
 }

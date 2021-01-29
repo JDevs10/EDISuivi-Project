@@ -40,7 +40,7 @@ export class SuiviCommandeComponent implements OnInit {
     sortorder: "DESC",
     limit: this.commandeService.limitForm.value.limit,
     page: (this.current_page - 1),
-    filter: {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
+    filter: {"ref":"","ref_client":"","client1":"","userCreated":"","assigned":"","creation_date":"","dateCommande":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
   };
 
   orders = [];
