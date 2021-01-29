@@ -589,7 +589,7 @@ class modEDISuivi extends DolibarrModules
         $EdiSuivi_mdp = "anexys1";
         $EdiSuivi_api_key = "3-8-13-12-7-8-24-8";
         $query1 = "INSERT INTO llx_user (`rowid`, `entity`, `ref_ext`, `ref_int`, `employee`, `fk_establishment`, `datec`, `tms`, `fk_user_creat`, `fk_user_modif`, `login`, `pass`, `pass_crypted`, `pass_temp`, `api_key`, `gender`, `civility`, `lastname`, `firstname`, `address`, `zip`, `town`, `fk_state`, `fk_country`, `job`, `skype`, `office_phone`, `office_fax`, `user_mobile`, `personal_mobile`, `email`, `personal_email`, `socialnetworks`, `signature`, `admin`, `module_comm`, `module_compta`, `fk_soc`, `fk_socpeople`, `fk_member`, `fk_user`, `fk_user_expense_validator`, `fk_user_holiday_validator`, `note_public`, `note`, `model_pdf`, `datelastlogin`, `datepreviouslogin`, `egroupware_id`, `ldap_sid`, `openid`, `statut`, `photo`, `lang`, `color`, `barcode`, `fk_barcode_type`, `accountancy_code`, `nb_holiday`, `thm`, `tjm`, `salary`, `salaryextra`, `dateemployment`, `dateemploymentend`, `weeklyhours`, `import_key`, `birth`, `pass_encoding`, `default_range`, `default_c_exp_tax_cat`, `twitter`, `facebook`, `instagram`, `snapchat`, `googleplus`, `youtube`, `whatsapp`, `linkedin`, `fk_warehouse`, `iplastlogin`, `ippreviouslogin`) 
-					VALUES (NULL, '1', NULL, NULL, '1', '0', NULL, CURRENT_TIMESTAMP, NULL, NULL, '$EdiSuivi_login', '$iApps_mdp,', NULL, NULL, '$iApps_api_key', NULL, NULL, '$EdiSuivi_login', NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, NULL, NULL, '0', NULL, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);";
+					VALUES (NULL, '1', NULL, NULL, '1', '0', NULL, CURRENT_TIMESTAMP, NULL, NULL, '$EdiSuivi_login', '$EdiSuivi_mdp,', NULL, NULL, '$EdiSuivi_api_key', NULL, NULL, '$EdiSuivi_login', NULL, NULL, NULL, NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '1', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', NULL, NULL, NULL, NULL, '0', NULL, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);";
 		
 		$res = $this->db->query($query1);
 		// Get User edisuivi id
@@ -604,7 +604,8 @@ class modEDISuivi extends DolibarrModules
 		// get dolibar permissions
 		if($userId > 0){
 			$rightsTable = [];
-			$query3 = "SELECT * FROM llx_rights_def WHERE module = 'edisuivi'";
+			//$query3 = "SELECT * FROM llx_rights_def WHERE module = 'edisuivi'";
+			$query3 = "SELECT * FROM `llx_rights_def` WHERE module = 'edisuivi' OR module = 'commande' AND perms = 'lire' AND entity = 1";
 			$res = $this->db->query($query3);
 			
 			if ($res->num_rows > 0) {

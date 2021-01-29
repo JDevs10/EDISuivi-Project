@@ -156,6 +156,10 @@ llxHeader('', $langs->trans('Commentaire'), '');
   flex-direction: row;
   text-align: center;
 }
+#comments-container > p{
+    margin: 30px auto;
+    width: 250px;
+}
 .my-row{
   display: flex;
   width: 100%;
@@ -202,6 +206,14 @@ llxHeader('', $langs->trans('Commentaire'), '');
 	height: 40px;
 	/* background-image: url('https://source.unsplash.com/random/40x40'); */
 	/* background: url(img/send.png) no-repeat center center fixed; */
+	color: white;
+	background-color: rgb(43,104,155);
+	font-weight: bold;
+}
+#submitReSyncComment{
+	cursor: pointer;
+	border: none;
+	height: 40px;
 	color: white;
 	background-color: rgb(43,104,155);
 	font-weight: bold;
@@ -283,7 +295,7 @@ $soc->fetch($object->socid);
 $res = $object->fetch_optionals();
 		
 $head = commande_prepare_head($object);
-dol_fiche_head($head, 'order', $langs->trans("CustomerOrder"), -1, 'order');
+dol_fiche_head($head, $active = 'Commentaire', 'order', $langs->trans("CustomerOrder"), -1, 'order');
 
 // Order card
 $linkback = "<a href='".DOL_URL_ROOT."/commande/card.php?id=$id'>Retour commande</a>";
@@ -345,6 +357,14 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
   <div id="allTheComments">
 	<?php
 		$tmp_dateTime = null;
+		if(count($commentList) == 0){
+			?>
+			<div id="comments-container">
+				<p>Aucun commentaire trouvé...</p>
+			</div>
+			<?php
+		}
+		
 		foreach($commentList as $key => $val){
 			if($tmp_dateTime != strftime("%d-%m-%Y", strtotime($val['date_creation']))){
 				?>
@@ -409,7 +429,8 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
 			<div><img src="img/emoji.png" alt="emoji icon "></div>
 			<div><img id="test-img" src="img/file-folder.png" alt="file attachment icon"></div>
 			-->
-			<div><input id="submitComment" type="submit" value="Envoyer"></div>
+			<div><input id="submitComment" type="submit" value="Envoyer" title="Envoyer les commentaires"></div>
+			<div><button id="submitReSyncComment" type="submit" onclick="reSyncComments()" title="Synchroniser les commentaires">Synchroniser</button></div>
 		</div>
 	</form>
   </div>
@@ -436,7 +457,7 @@ window.addEventListener('load', () => {
 	if(mainContainer.clientHeight > window.screen.height){
 		const allTheComments = document.getElementById("allTheComments");
 		const commenting = document.getElementById("commenting");
-		const newHeight = window.screen.height - (commenting.clientHeight + commenting.clientHeight + 50 + 180); // +50 for dolibarr navbar, +180 for dolibarr fiche cmd header
+		const newHeight = window.screen.height - (commenting.clientHeight + commenting.clientHeight + 50 + 250); // +50 for dolibarr navbar, +180 for dolibarr fiche cmd header
 		
 		allTheComments.style.maxHeight = newHeight+"px";
 		allTheComments.style.overflowY = "scroll";
@@ -444,34 +465,12 @@ window.addEventListener('load', () => {
 	}
 });
 
+
+
 const test = document.getElementById("test-img");
 test.addEventListener('click', sendComment, false);
 
-function sendComment(){
-	const commentMessage = document.getElementById("comment");
-	if(commentMessage.value.replaceAll("'","''") == ""){
-		alert("comment is empty!");
-		return;
-	}
-	
-	$.ajax({
-		url: 'commentaire_detail.php',
-		method: 'POST',
-		dataType: 'json',
-		data: {
-			origin_id: <?php print $orderId ?>,
-			comment: commentMessage.value.replaceAll("'","''"),
-			fk_soc: "null",
-			user: <?php print $user->id ?>
-		},
-		success: function (response){
-			console.log('response : ',response);
-			//window.location.reload();
-		},
-		error: function (error){
-			//window.location.reload();
-		}
-	});
+function reSyncComments(){
 	window.location.reload();
 }
 </script>

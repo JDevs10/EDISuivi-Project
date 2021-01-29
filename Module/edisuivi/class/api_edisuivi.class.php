@@ -22,6 +22,7 @@ use Luracast\Restler\Format\UploadFormat;
 
 dol_include_once('/edisuivi/class/entreprise.class.php');
 dol_include_once('/edisuivi/class/utilisateur.class.php');
+dol_include_once('/edisuivi/class/commentaire.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
  
@@ -45,6 +46,7 @@ class EDISuiviApi extends DolibarrApi
      */
     public $entreprise;
 	public $utilisateur;
+	public $commentaire;
 
     /**
      * Constructor
@@ -58,6 +60,7 @@ class EDISuiviApi extends DolibarrApi
         $this->db = $db;
         $this->entreprise = new Entreprise($this->db);
 		$this->utilisateur = new Utilisateur($this->db);
+		$this->commentaire = new Commentaire($this->db);
     }
 	
 	
@@ -657,7 +660,7 @@ class EDISuiviApi extends DolibarrApi
      * @url	GET orders/of-user/v3
      * @throws 	RestException
      */
-    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = '{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}')
+    public function getOrdersOfUser_v3($socId, $status_mode = 1, $sortfield = "c.rowid", $sortorder = 'ASC', $limit = 25, $page = 0, $filter = '{"ref":"","ref_client":"","town":"","zip":"","creation_date":"","dateCommande":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}')
     {	// "{'test': 1, 'test2': 'Hey', 'test3': 15.66}"
 		// {"ref":"","ref_client":"JL","town":"","zip":"","creation_date":"","delivery_date":"2020-12-28","total_ht":"","total_tva":"","total_ttc":"","statut":"1","billed":"0","limit":"25"}
 		// {"ref":"","ref_client":"","town":"","zip":"","creation_date":"","delivery_date":"","total_ht":"","total_tva":"","total_ttc":"","statut":"","billed":"","limit":"25"}
@@ -1136,6 +1139,7 @@ class EDISuiviApi extends DolibarrApi
 				$cmd = array(
 					"rowid" => $row['rowid'],
 					"ref" => $row['ref'],
+					"fk_soc" => $row['fk_soc_id'],
 					"client1" => $row['namecompagny'],
 					"client2" => $row['ref_client'],
 					"assign" => ($row['fk_socpeople'] == null || $row['fk_socpeople'] == "" ? "" : $row['fk_socpeople']),
@@ -1314,8 +1318,202 @@ class EDISuiviApi extends DolibarrApi
 		);
 	 }
 	 
+	 
+	/*###################################################################################################################################*/
+	/*#############################################  Gestion Api ORDER COMMENTS  ########################################################*/
+	 
+	 
+	 /**
+     * Get order comments
+     *
+     * Return an array of order comments information
+     *
+     * @param 	int 	$orderId 			ID of order
+     * @return 	array|mixed 			data without useless information
+     *
+     * @url	GET comments/order/id/
+     * @throws 	RestException
+     */
+	public function getOrderCommentsById($orderId){
+		if (! DolibarrApiAccess::$user->rights->edisuivi->commentaire->read) {
+            throw new RestException(401);
+        }
+		
+		$ALL_COMMENTS = null;
+        $sql = "SELECT cmt.rowid, cmt.origin_id, cmt.date_creation, cmt.text, cmt.date_modification, cmt.edited, (SELECT s.nom FROM llx_societe as s WHERE s.rowid = cmt.fk_soc) as fk_soc, (SELECT u.lastname FROM llx_user as u WHERE u.rowid = cmt.fk_user) as fk_user ";
+		$sql .= "FROM llx_edisuivi_commentaire as cmt ";
+		$sql .= "WHERE cmt.origin_id = $orderId"; 
+		$res = $this->db->query($sql);
+
+		
+		if($res->num_rows > 0){
+			$index=0;
+			while($row = $this->db->fetch_array($sql)){
+				//print("<pre>".print_r($row,true)."</pre>");
+				
+				$ALL_COMMENTS[$index]['rowid'] = $row['rowid'];
+				$ALL_COMMENTS[$index]['origin_id'] = $row['origin_id'];
+				$ALL_COMMENTS[$index]['date_creation'] = $row['date_creation'];
+				$ALL_COMMENTS[$index]['date_creation_date'] = $this->date_in_french_format("%A %d %B", $row['date_creation']); //strftime("%A, %B %d", strtotime($row['date_creation']));
+				$ALL_COMMENTS[$index]['date_creation_time'] = strftime("%Hh%M", strtotime($row['date_creation']));
+				$ALL_COMMENTS[$index]['text'] = $row['text'];
+				$ALL_COMMENTS[$index]['date_modification'] = $row['date_modification'];
+				$ALL_COMMENTS[$index]['edited'] = $row['edited'];
+				$ALL_COMMENTS[$index]['fk_soc'] = $row['fk_soc'];
+				$ALL_COMMENTS[$index]['fk_user'] = $row['fk_user'];
+				$index++;
+			}
+			
+			return array(
+				"status" => "success",
+				"message" => "Commentaires de la commande ".$orderId." trouve.",
+				"commentaires" => $ALL_COMMENTS
+			);
+			
+		}else{
+            return array(
+				"status" => "error",
+				"message" => "Aucune commentaire trouve.",
+				"commentaires" => 'null'
+			);
+        }
+	}
+	
+	// To set french date format  
+	private function date_in_french_format($params, $date){
+
+        if($date==NULL){ 
+			return "";
+		}
+        setlocale(LC_ALL, 'fr_FR');
+        return strftime( "$params" , strtotime($date));
+		
+		// return this Mercredi 16 septembre 2020
+    }
 
 
+    /**
+     * Create comment order object
+     *
+	 * @param   string  $origin_id		Order id
+	 * @param   string  $message		Message
+	 * @param   string  $fk_soc			Company id
+	 * @param   string  $user			User id
+     * @return 	array|mixed 			status request
+     *
+	 * @url	GET comment/order
+	 * @url	POST comment/order
+     */
+    public function postComment($origin_id, $message, $fk_soc, $user)
+    {
+        if(! DolibarrApiAccess::$user->rights->edisuivi->commentaire->write) {
+            throw new RestException(401);
+        }
+		
+		if(empty($message)){
+			return array(
+				"status" => "error",
+				"message" => "Commentaire vide",
+				"commentaires" => ""
+			);
+		}
+        
+		$sql = "INSERT llx_edisuivi_commentaire (rowid, origin_id, date_creation, text, date_modification, edited, fk_soc, fk_user) ";
+		$sql .= "VALUES (null, ".$origin_id.", CURRENT_TIMESTAMP, '".str_replace("'", "''", $message)."', null, null, ".$fk_soc.", ".$user.")";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				"message" => "Commentaire cree.",
+				"commentaires" => ""
+			);
+		}else{
+			return array(
+				"status" => "error",
+				"message" => "Commentaire pas cree.",
+				"commentaires" => ""
+			);
+		}
+    }
+
+    /**
+     * Update order comment
+     *
+     * @param int   $id             Id of comment to update
+     * @param array $request_data   Datas => Exp:{"origin_id":"","date_creation":"","message":"","fk_soc":"","user":""}
+     * @return int
+     *
+     * @url	PUT comment/{id}
+     */
+    public function putComment($id, $request_data = '{"origin_id":"","date_creation":"","message":"","fk_soc":"","user":""}')
+    {
+        if(! DolibarrApiAccess::$user->rights->edisuivi->commentaire->write) {
+            throw new RestException(401);
+        }
+		/*
+        $sql = "INSERT llx_edisuivi_commentaire (rowid, origin_id, date_creation, text, date_modification, edited, fk_soc, fk_user) ";
+		$sql .= "VALUES (null, ".$request_data['origin_id'].", CURRENT_TIMESTAMP, '".str_replace("'", "''", $request_data['message'])."', null, null, ".$request_data['fk_soc'].", ".$request_data['user'].") ";
+		$sql .= "WHERE rowid = $id";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				'code' => 200,
+				'message' => 'Commentaire mit a jour.'
+			);
+		}else{
+			return array(
+				"status" => "error",
+				'code' => 404,
+				'message' => 'Commentaire pas a jour.'
+			);
+		}
+		*/
+		return array(
+			"status" => "error",
+			'code' => 404,
+			'message' => 'Api non disponible, veuillez continuer le developpement'
+		);
+    }
+
+    /**
+     * Delete comment
+     *
+     * @param   int     $id   Commentaire ID
+     * @return  array
+     *
+     * @url	DELETE comment/{id}
+     */
+    public function deleteComment($id)
+    {
+        if (! DolibarrApiAccess::$user->rights->edisuivi->commentaire->delete) {
+            throw new RestException(401);
+        }
+        
+		$sql = "DELETE FROM llx_edisuivi_commentaire WHERE rowid = $id";
+		$res = $this->db->query($sql);
+		
+		if($res > 0){
+			return array(
+				"status" => "success",
+				'code' => 200,
+				'message' => 'Commentaire deleted'
+			);
+		}else{
+			return array(
+				"status" => "error",
+				'code' => 404,
+				'message' => 'Commentaire deleted'
+			);
+		}
+    }
+
+
+	/*#########################################################################################################################################*/
+	/*###############################################  Gestion Api DOCUMENTS DOWNLOAD  ########################################################*/
+	
 	 
 	 /**
 	 * Get all documents of order id.
